@@ -1,0 +1,1071 @@
+/* =====================================================================
+ * Stitch theme for Gogs
+ * Source design system: "DevHub Pro Portfolio" / "Midnight Elite" (Stitch)
+ *
+ * This file is a non-invasive overlay. It is loaded AFTER gogs.min.css and
+ * semantic-2.4.2.min.css through custom/templates/inject/head.tmpl, so it
+ * wins specificity ties without touching the embedded LESS sources.
+ *
+ * Design language: dark glassmorphism, deep indigo/midnight backdrop,
+ * lavender primary, gold tertiary, JetBrains Mono for code, Inter for UI,
+ * 16px/8px radius, neon hover, cubic-bezier(0.4, 0, 0.2, 1) easing.
+ * ===================================================================== */
+
+/* ---------------------------------------------------------------------
+ * 1. Design tokens
+ * ------------------------------------------------------------------- */
+:root {
+  /* Surfaces */
+  --st-bg-base: #0b0a10;
+  --st-bg-grad-1: #141218;
+  --st-bg-grad-2: #1d1b29;
+  --st-bg-grad-3: #0f0d18;
+  --st-surface: rgba(20, 18, 24, 0.72);
+  --st-surface-strong: rgba(33, 31, 36, 0.92);
+  --st-surface-bright: rgba(43, 41, 47, 0.85);
+  --st-surface-low: rgba(15, 13, 19, 0.78);
+  --st-surface-frosted: rgba(17, 24, 39, 0.55);
+  --st-glass-blur: 24px;
+
+  /* Borders & strokes */
+  --st-border: rgba(255, 255, 255, 0.08);
+  --st-border-strong: rgba(255, 255, 255, 0.14);
+  --st-border-soft: rgba(255, 255, 255, 0.04);
+  --st-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  /* Shadows */
+  --st-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --st-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.35);
+  --st-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.45);
+  --st-shadow-glow: 0 0 0 1px rgba(207, 188, 255, 0.35),
+                    0 0 24px rgba(207, 188, 255, 0.18);
+  --st-shadow-cyan: 0 0 0 1px rgba(56, 189, 248, 0.45),
+                    0 0 28px rgba(56, 189, 248, 0.22);
+
+  /* Brand palette (from Stitch design system) */
+  --st-primary: #cfbcff;
+  --st-primary-container: #6750a4;
+  --st-primary-strong: #4f378a;
+  --st-on-primary: #22005d;
+  --st-secondary: #cdc0e9;
+  --st-secondary-container: #4d4465;
+  --st-tertiary: #e7c365;
+  --st-tertiary-container: #c9a74d;
+  --st-accent-cyan: #38bdf8;
+  --st-accent-magenta: #c084fc;
+
+  /* Status */
+  --st-success: #6cc644;
+  --st-success-bg: rgba(108, 198, 68, 0.12);
+  --st-warning: #fbbd08;
+  --st-warning-bg: rgba(251, 189, 8, 0.12);
+  --st-danger: #ffb4ab;
+  --st-danger-bg: rgba(147, 0, 10, 0.28);
+  --st-info: #38bdf8;
+  --st-info-bg: rgba(56, 189, 248, 0.12);
+
+  /* Text */
+  --st-text: #e6e0e9;
+  --st-text-muted: #cbc4d2;
+  --st-text-subtle: #948e9c;
+  --st-text-inverse: #1d1b20;
+
+  /* Typography */
+  --st-font-sans: "Inter", "Helvetica Neue", "Microsoft YaHei", Arial, sans-serif;
+  --st-font-mono: "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, monospace;
+  --st-tracking-tight: -0.02em;
+
+  /* Radius */
+  --st-radius-xs: 6px;
+  --st-radius-sm: 8px;
+  --st-radius-md: 12px;
+  --st-radius-lg: 16px;
+  --st-radius-xl: 24px;
+  --st-radius-pill: 999px;
+
+  /* Motion */
+  --st-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --st-dur-fast: 150ms;
+  --st-dur: 240ms;
+  --st-dur-slow: 380ms;
+}
+
+/* ---------------------------------------------------------------------
+ * 2. Global base + background gradient
+ * ------------------------------------------------------------------- */
+html {
+  background: var(--st-bg-base);
+  color-scheme: dark;
+}
+
+body:not(.full-width),
+body {
+  font-family: var(--st-font-sans) !important;
+  background: var(--st-bg-base) !important;
+  color: var(--st-text);
+  min-width: 0;
+  background-image:
+    radial-gradient(1200px 600px at 8% -10%, rgba(103, 80, 164, 0.35), transparent 60%),
+    radial-gradient(900px 500px at 110% 0%, rgba(56, 189, 248, 0.18), transparent 55%),
+    radial-gradient(800px 800px at 50% 120%, rgba(231, 195, 101, 0.10), transparent 60%),
+    linear-gradient(180deg, var(--st-bg-grad-1) 0%, var(--st-bg-grad-3) 100%);
+  background-attachment: fixed;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5,
+.ui.header,
+.ui.menu,
+.ui.input input,
+.ui.button:not(.label) {
+  font-family: var(--st-font-sans) !important;
+  letter-spacing: var(--st-tracking-tight);
+  color: var(--st-text);
+}
+
+.ui.header { color: var(--st-text); }
+.ui.header .sub.header,
+.ui.header .description { color: var(--st-text-muted); }
+
+a { color: var(--st-primary); transition: color var(--st-dur-fast) var(--st-ease); }
+a:hover { color: var(--st-secondary); }
+
+p, span, div, li, td, th, label,
+.ui .text.grey,
+.ui .text.light.grey,
+.ui .text.black {
+  color: inherit;
+}
+.ui .text.grey { color: var(--st-text-muted) !important; }
+.ui .text.light.grey { color: var(--st-text-subtle) !important; }
+.ui .text.black { color: var(--st-text) !important; }
+.ui .text.blue { color: var(--st-accent-cyan) !important; }
+.ui .text.purple { color: var(--st-primary) !important; }
+.ui .text.green { color: var(--st-success) !important; }
+.ui .text.yellow,
+.ui .text.gold { color: var(--st-tertiary) !important; }
+.ui .text.red { color: var(--st-danger) !important; }
+
+::selection {
+  background: rgba(207, 188, 255, 0.28);
+  color: #fff;
+}
+
+/* Custom scrollbar */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--st-radius-pill);
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(207, 188, 255, 0.35); }
+
+/* ---------------------------------------------------------------------
+ * 3. Top navigation bar  (.following.bar.light)
+ * ------------------------------------------------------------------- */
+.following.bar.light {
+  background: linear-gradient(180deg, rgba(20, 18, 24, 0.85), rgba(20, 18, 24, 0.55)) !important;
+  backdrop-filter: blur(var(--st-glass-blur));
+  -webkit-backdrop-filter: blur(var(--st-glass-blur));
+  border-bottom: 1px solid var(--st-border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+  position: sticky;
+  top: 0;
+}
+
+.following.bar .top.menu a.item,
+.following.bar .top.menu .dropdown.item {
+  color: var(--st-text-muted) !important;
+  font-weight: 500;
+  transition: color var(--st-dur-fast) var(--st-ease),
+              background var(--st-dur-fast) var(--st-ease);
+}
+
+.following.bar .top.menu a.item:hover,
+.following.bar .top.menu .dropdown.item:hover {
+  color: var(--st-text) !important;
+  background: rgba(207, 188, 255, 0.06) !important;
+}
+
+.following.bar .top.menu a.item.active {
+  color: var(--st-primary) !important;
+  position: relative;
+}
+.following.bar .top.menu a.item.active::after {
+  content: "";
+  position: absolute;
+  left: 12px; right: 12px; bottom: 6px;
+  height: 2px;
+  border-radius: var(--st-radius-pill);
+  background: linear-gradient(90deg, var(--st-primary), var(--st-accent-cyan));
+}
+
+.following.bar .top.menu a.item.brand img.ui.mini.image {
+  border-radius: var(--st-radius-sm);
+  filter: drop-shadow(0 0 8px rgba(207, 188, 255, 0.45));
+}
+
+.following.bar .searchbox {
+  background: var(--st-surface-low) !important;
+  color: var(--st-text);
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-sm) !important;
+}
+.following.bar .searchbox:focus {
+  background: var(--st-surface-strong) !important;
+  border-color: var(--st-accent-cyan) !important;
+  box-shadow: var(--st-shadow-cyan);
+}
+
+/* ---------------------------------------------------------------------
+ * 4. Footer
+ * ------------------------------------------------------------------- */
+footer {
+  background: linear-gradient(180deg, rgba(15, 13, 24, 0.85), rgba(11, 10, 16, 1)) !important;
+  border-top: 1px solid var(--st-border) !important;
+  color: var(--st-text-subtle) !important;
+  backdrop-filter: blur(var(--st-glass-blur));
+  -webkit-backdrop-filter: blur(var(--st-glass-blur));
+}
+footer .container .fa { color: var(--st-primary) !important; }
+footer .container .links > * { border-left-color: var(--st-border) !important; }
+footer a { color: var(--st-text-muted); }
+footer a:hover { color: var(--st-primary); }
+
+/* ---------------------------------------------------------------------
+ * 5. Surfaces: containers, segments, cards (glassmorphism)
+ * ------------------------------------------------------------------- */
+.ui.segment,
+.ui.segments,
+.ui.attached.segment,
+.ui.tab.segment,
+.ui.basic.segment {
+  background: var(--st-surface) !important;
+  color: var(--st-text);
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-lg) !important;
+  box-shadow: var(--st-shadow-sm), var(--st-inner-glow) !important;
+  backdrop-filter: blur(var(--st-glass-blur));
+  -webkit-backdrop-filter: blur(var(--st-glass-blur));
+  transition: transform var(--st-dur) var(--st-ease),
+              box-shadow var(--st-dur) var(--st-ease),
+              border-color var(--st-dur) var(--st-ease);
+}
+
+.ui.basic.segment {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none;
+}
+
+.ui.segments > .segment {
+  background: transparent !important;
+  border-color: var(--st-border) !important;
+}
+
+.ui.segment.attached + .ui.segment.attached {
+  border-top: none !important;
+}
+
+.ui.segment > .ui.header,
+.ui.segment > h1,
+.ui.segment > h2,
+.ui.segment > h3,
+.ui.segment > h4 {
+  color: var(--st-text);
+}
+
+/* Cards */
+.ui.card,
+.ui.cards > .card {
+  background: var(--st-surface) !important;
+  color: var(--st-text);
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-lg) !important;
+  box-shadow: var(--st-shadow-sm), var(--st-inner-glow) !important;
+  backdrop-filter: blur(var(--st-glass-blur));
+  -webkit-backdrop-filter: blur(var(--st-glass-blur));
+  transition: transform var(--st-dur) var(--st-ease),
+              box-shadow var(--st-dur) var(--st-ease),
+              border-color var(--st-dur) var(--st-ease);
+}
+.ui.card:hover,
+.ui.cards > .card:hover,
+.ui.segment.hoverable:hover {
+  transform: translateY(-3px);
+  border-color: rgba(207, 188, 255, 0.35) !important;
+  box-shadow: var(--st-shadow-md), var(--st-shadow-glow) !important;
+}
+.ui.card > .content,
+.ui.cards > .card > .content {
+  border-top: 1px solid var(--st-border-soft) !important;
+}
+.ui.card > .content > .header,
+.ui.cards > .card > .content > .header {
+  color: var(--st-text) !important;
+}
+.ui.card > .extra,
+.ui.cards > .card > .extra {
+  color: var(--st-text-subtle) !important;
+  border-top: 1px solid var(--st-border-soft) !important;
+}
+
+/* ---------------------------------------------------------------------
+ * 6. Buttons
+ * ------------------------------------------------------------------- */
+.ui.button {
+  font-family: var(--st-font-sans) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+  border-radius: var(--st-radius-sm) !important;
+  background: var(--st-surface-strong);
+  color: var(--st-text);
+  border: 1px solid var(--st-border) !important;
+  box-shadow: var(--st-inner-glow);
+  transition: transform var(--st-dur-fast) var(--st-ease),
+              background var(--st-dur-fast) var(--st-ease),
+              border-color var(--st-dur-fast) var(--st-ease),
+              box-shadow var(--st-dur-fast) var(--st-ease),
+              color var(--st-dur-fast) var(--st-ease);
+}
+.ui.button:hover {
+  background: var(--st-surface-bright);
+  border-color: var(--st-border-strong) !important;
+  color: var(--st-text);
+  transform: translateY(-1px);
+  box-shadow: var(--st-shadow-sm), var(--st-inner-glow);
+}
+.ui.button:active { transform: translateY(0); }
+.ui.button:focus,
+.ui.button:focus-visible {
+  outline: none;
+  border-color: var(--st-accent-cyan) !important;
+  box-shadow: var(--st-shadow-cyan);
+}
+.ui.button.disabled,
+.ui.button:disabled,
+.ui.disabled.button {
+  opacity: 0.45 !important;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Primary */
+.ui.primary.button,
+.ui.primary.buttons .button {
+  background: linear-gradient(135deg, var(--st-primary-container), var(--st-primary-strong)) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 24px rgba(103, 80, 164, 0.35), var(--st-inner-glow) !important;
+}
+.ui.primary.button:hover,
+.ui.primary.buttons .button:hover {
+  background: linear-gradient(135deg, #7a64bd, #5e418f) !important;
+  box-shadow: 0 12px 32px rgba(103, 80, 164, 0.55), var(--st-shadow-glow) !important;
+  transform: translateY(-2px);
+}
+
+/* Positive / success */
+.ui.positive.button,
+.ui.green.button,
+.ui.positive.buttons .button {
+  background: linear-gradient(135deg, #2f8f3a, #4caf50) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+/* Negative / danger */
+.ui.negative.button,
+.ui.red.button {
+  background: linear-gradient(135deg, #93000a, #c1261b) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+/* Basic = ghost */
+.ui.basic.button,
+.ui.basic.buttons .button {
+  background: transparent !important;
+  color: var(--st-text-muted) !important;
+  box-shadow: 0 0 0 1px var(--st-border) inset !important;
+}
+.ui.basic.button:hover {
+  background: rgba(207, 188, 255, 0.08) !important;
+  color: var(--st-text) !important;
+  box-shadow: 0 0 0 1px var(--st-border-strong) inset !important;
+}
+
+/* Labeled / icon buttons */
+.ui.labeled.icon.button > .icon,
+.ui.icon.button > .icon { color: inherit; }
+
+/* ---------------------------------------------------------------------
+ * 7. Inputs and forms
+ * ------------------------------------------------------------------- */
+.ui.input > input,
+.ui.form input[type="text"],
+.ui.form input[type="email"],
+.ui.form input[type="password"],
+.ui.form input[type="number"],
+.ui.form input[type="search"],
+.ui.form input[type="url"],
+.ui.form textarea,
+.ui.selection.dropdown {
+  background: var(--st-surface-low) !important;
+  color: var(--st-text) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-sm) !important;
+  transition: border-color var(--st-dur-fast) var(--st-ease),
+              box-shadow var(--st-dur-fast) var(--st-ease),
+              background var(--st-dur-fast) var(--st-ease);
+}
+.ui.input > input::placeholder,
+.ui.form input::placeholder,
+.ui.form textarea::placeholder { color: var(--st-text-subtle); }
+
+.ui.input > input:focus,
+.ui.form input:focus,
+.ui.form textarea:focus,
+.ui.selection.dropdown:focus,
+.ui.selection.active.dropdown {
+  background: var(--st-surface-strong) !important;
+  border-color: var(--st-accent-cyan) !important;
+  box-shadow: var(--st-shadow-cyan) !important;
+  outline: none !important;
+}
+
+.ui.form .field > label,
+.ui.form .grouped.fields > label,
+.ui.form > .field > label,
+label {
+  color: var(--st-text) !important;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.ui.form .field .help,
+.ui.form .help,
+.help.text,
+small.help {
+  color: var(--st-text-subtle) !important;
+}
+
+.ui.form .field.error input,
+.ui.form .field.error textarea,
+.ui.form .field.error .ui.dropdown {
+  background: rgba(147, 0, 10, 0.18) !important;
+  border-color: var(--st-danger) !important;
+  color: var(--st-text) !important;
+}
+.ui.form .error.message { background: var(--st-danger-bg) !important; color: #ffe8e6 !important; border-color: rgba(255, 180, 171, 0.35) !important; }
+
+/* Checkbox */
+.ui.checkbox label,
+.ui.checkbox + label { color: var(--st-text) !important; }
+.ui.checkbox .box::before,
+.ui.checkbox label::before {
+  background: var(--st-surface-low) !important;
+  border: 1px solid var(--st-border-strong) !important;
+  border-radius: var(--st-radius-xs) !important;
+}
+.ui.checkbox input:checked ~ .box::before,
+.ui.checkbox input:checked ~ label::before {
+  background: linear-gradient(135deg, var(--st-primary-container), var(--st-primary-strong)) !important;
+  border-color: transparent !important;
+}
+.ui.checkbox .box::after,
+.ui.checkbox label::after { color: #fff !important; }
+
+/* ---------------------------------------------------------------------
+ * 8. Dropdowns and menus
+ * ------------------------------------------------------------------- */
+.ui.dropdown .menu,
+.ui.menu .ui.dropdown .menu,
+.ui.selection.dropdown .menu {
+  background: var(--st-surface-strong) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-md) !important;
+  box-shadow: var(--st-shadow-md), var(--st-inner-glow) !important;
+  backdrop-filter: blur(var(--st-glass-blur));
+  -webkit-backdrop-filter: blur(var(--st-glass-blur));
+  padding: 6px;
+  margin-top: 8px !important;
+  animation: stitchFadeUp var(--st-dur) var(--st-ease);
+}
+.ui.dropdown .menu > .item,
+.ui.dropdown .menu > .header {
+  color: var(--st-text-muted) !important;
+  border-radius: var(--st-radius-xs) !important;
+  transition: background var(--st-dur-fast) var(--st-ease),
+              color var(--st-dur-fast) var(--st-ease);
+}
+.ui.dropdown .menu > .header { color: var(--st-text-subtle) !important; text-transform: uppercase; letter-spacing: 0.06em; font-size: 11px !important; }
+.ui.dropdown .menu > .item:hover,
+.ui.dropdown .menu > .item.selected,
+.ui.dropdown .menu > .item.active {
+  background: rgba(207, 188, 255, 0.10) !important;
+  color: var(--st-text) !important;
+}
+.ui.dropdown .menu > .divider {
+  background: var(--st-border) !important;
+  margin: 6px 4px !important;
+}
+.ui.dropdown .menu .ui.header { color: var(--st-text-subtle) !important; }
+
+/* Vertical / sidebar style menus */
+.ui.vertical.menu,
+.ui.secondary.vertical.menu {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-lg) !important;
+  box-shadow: var(--st-shadow-sm), var(--st-inner-glow) !important;
+  backdrop-filter: blur(var(--st-glass-blur));
+  -webkit-backdrop-filter: blur(var(--st-glass-blur));
+  padding: 6px;
+}
+.ui.vertical.menu .item,
+.ui.secondary.vertical.menu .item {
+  color: var(--st-text-muted) !important;
+  border-radius: var(--st-radius-sm) !important;
+  border-color: var(--st-border-soft) !important;
+}
+.ui.vertical.menu .item::before,
+.ui.secondary.vertical.menu .item::before { background: var(--st-border-soft) !important; }
+.ui.vertical.menu .item:hover,
+.ui.secondary.vertical.menu .item:hover {
+  background: rgba(207, 188, 255, 0.08) !important;
+  color: var(--st-text) !important;
+}
+.ui.vertical.menu .item.active,
+.ui.secondary.vertical.menu .item.active {
+  background: linear-gradient(135deg, rgba(103, 80, 164, 0.35), rgba(79, 55, 138, 0.35)) !important;
+  color: #fff !important;
+  position: relative;
+}
+.ui.vertical.menu .item.active::after,
+.ui.secondary.vertical.menu .item.active::after {
+  content: "";
+  position: absolute;
+  left: -6px; top: 8px; bottom: 8px;
+  width: 3px;
+  border-radius: var(--st-radius-pill);
+  background: linear-gradient(180deg, var(--st-primary), var(--st-accent-cyan));
+  box-shadow: 0 0 12px rgba(207, 188, 255, 0.55);
+}
+
+/* Horizontal pointing / tabular menus */
+.ui.tabular.menu,
+.ui.pointing.menu,
+.ui.secondary.pointing.menu {
+  border-bottom: 1px solid var(--st-border) !important;
+  background: transparent !important;
+}
+.ui.tabular.menu .item,
+.ui.pointing.menu .item,
+.ui.secondary.pointing.menu .item {
+  color: var(--st-text-muted) !important;
+  border-color: transparent !important;
+  background: transparent !important;
+}
+.ui.tabular.menu .item.active,
+.ui.pointing.menu .item.active,
+.ui.secondary.pointing.menu .active.item {
+  background: transparent !important;
+  color: var(--st-text) !important;
+  border-color: var(--st-primary) !important;
+}
+
+/* ---------------------------------------------------------------------
+ * 9. Tables
+ * ------------------------------------------------------------------- */
+.ui.table {
+  background: var(--st-surface) !important;
+  color: var(--st-text) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-lg) !important;
+  overflow: hidden;
+  backdrop-filter: blur(var(--st-glass-blur));
+  -webkit-backdrop-filter: blur(var(--st-glass-blur));
+}
+.ui.table thead th {
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: var(--st-text-muted) !important;
+  border-bottom: 1px solid var(--st-border) !important;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.ui.table tbody tr { transition: background var(--st-dur-fast) var(--st-ease); }
+.ui.table tbody tr td { border-top: 1px solid var(--st-border-soft) !important; }
+.ui.table tbody tr:hover { background: rgba(207, 188, 255, 0.04) !important; }
+.ui.table tfoot th { background: rgba(255, 255, 255, 0.02) !important; border-top: 1px solid var(--st-border) !important; color: var(--st-text-muted) !important; }
+
+/* ---------------------------------------------------------------------
+ * 10. Labels / chips / tags
+ * ------------------------------------------------------------------- */
+.ui.label,
+.ui.labels .label {
+  background: rgba(207, 188, 255, 0.12) !important;
+  color: var(--st-primary) !important;
+  border: 1px solid rgba(207, 188, 255, 0.22) !important;
+  border-radius: var(--st-radius-pill) !important;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 0.32em 0.78em !important;
+}
+.ui.label.basic { background: transparent !important; }
+.ui.green.label { background: rgba(108, 198, 68, 0.14) !important; color: var(--st-success) !important; border-color: rgba(108, 198, 68, 0.28) !important; }
+.ui.red.label { background: var(--st-danger-bg) !important; color: var(--st-danger) !important; border-color: rgba(255, 180, 171, 0.32) !important; }
+.ui.yellow.label,
+.ui.gold.label { background: rgba(231, 195, 101, 0.14) !important; color: var(--st-tertiary) !important; border-color: rgba(231, 195, 101, 0.30) !important; }
+.ui.blue.label { background: rgba(56, 189, 248, 0.14) !important; color: var(--st-accent-cyan) !important; border-color: rgba(56, 189, 248, 0.30) !important; }
+.ui.purple.label { background: rgba(192, 132, 252, 0.14) !important; color: var(--st-accent-magenta) !important; border-color: rgba(192, 132, 252, 0.32) !important; }
+
+.ui.sha.label {
+  font-family: var(--st-font-mono) !important;
+  background: var(--st-surface-low) !important;
+  color: var(--st-text-muted) !important;
+  border: 1px solid var(--st-border) !important;
+}
+
+/* ---------------------------------------------------------------------
+ * 11. Messages
+ * ------------------------------------------------------------------- */
+.ui.message {
+  background: var(--st-surface) !important;
+  color: var(--st-text) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-md) !important;
+  box-shadow: var(--st-shadow-sm), var(--st-inner-glow) !important;
+}
+.ui.warning.message {
+  background: var(--st-warning-bg) !important;
+  border-color: rgba(251, 189, 8, 0.32) !important;
+  color: #fde9a9 !important;
+}
+.ui.warning.header { background: var(--st-warning-bg) !important; border-color: rgba(251, 189, 8, 0.32) !important; color: #fde9a9 !important; }
+.ui.info.segment.top,
+.ui.info.message {
+  background: var(--st-info-bg) !important;
+  border-color: rgba(56, 189, 248, 0.30) !important;
+  color: #cdeafd !important;
+}
+.ui.negative.message,
+.ui.error.message {
+  background: var(--st-danger-bg) !important;
+  border-color: rgba(255, 180, 171, 0.35) !important;
+  color: #ffe8e6 !important;
+}
+.ui.positive.message,
+.ui.success.message {
+  background: var(--st-success-bg) !important;
+  border-color: rgba(108, 198, 68, 0.30) !important;
+  color: #d6f1c5 !important;
+}
+
+/* ---------------------------------------------------------------------
+ * 12. Modals / dimmers / popups
+ * ------------------------------------------------------------------- */
+.ui.dimmer {
+  background: rgba(11, 10, 16, 0.72) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.ui.modal {
+  background: var(--st-surface-strong) !important;
+  color: var(--st-text) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-lg) !important;
+  box-shadow: var(--st-shadow-lg), var(--st-inner-glow) !important;
+  backdrop-filter: blur(var(--st-glass-blur));
+  -webkit-backdrop-filter: blur(var(--st-glass-blur));
+  animation: stitchScaleIn var(--st-dur) var(--st-ease);
+}
+.ui.modal > .header {
+  background: transparent !important;
+  color: var(--st-text) !important;
+  border-bottom: 1px solid var(--st-border) !important;
+}
+.ui.modal > .content {
+  background: transparent !important;
+  color: var(--st-text-muted) !important;
+}
+.ui.modal > .actions {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-top: 1px solid var(--st-border) !important;
+}
+.ui.popup {
+  background: var(--st-surface-strong) !important;
+  color: var(--st-text) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-md) !important;
+  box-shadow: var(--st-shadow-md), var(--st-inner-glow) !important;
+}
+.ui.popup::before { background: var(--st-surface-strong) !important; box-shadow: 1px 1px 0 0 var(--st-border) !important; }
+
+/* ---------------------------------------------------------------------
+ * 13. Code, markdown, pre
+ * ------------------------------------------------------------------- */
+pre, code, kbd, samp { font-family: var(--st-font-mono) !important; }
+code, pre.raw, .markdown code {
+  background: var(--st-surface-low) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-xs) !important;
+  color: var(--st-text) !important;
+}
+pre.raw, .markdown pre {
+  border-radius: var(--st-radius-md) !important;
+  padding: 14px 18px !important;
+}
+.markdown { color: var(--st-text); }
+.markdown h1, .markdown h2 { border-bottom: 1px solid var(--st-border); padding-bottom: 0.3em; }
+.markdown blockquote {
+  border-left: 3px solid var(--st-primary);
+  background: rgba(207, 188, 255, 0.05);
+  color: var(--st-text-muted);
+  border-radius: var(--st-radius-xs);
+}
+.markdown table { background: var(--st-surface) !important; border: 1px solid var(--st-border) !important; }
+.markdown table th, .markdown table td { border-color: var(--st-border) !important; }
+.markdown a { color: var(--st-accent-cyan); }
+
+/* ---------------------------------------------------------------------
+ * 14. Avatars
+ * ------------------------------------------------------------------- */
+.ui.avatar.image,
+.avatar > .ui.image,
+img.avatar {
+  border-radius: var(--st-radius-pill) !important;
+  box-shadow: 0 0 0 1px var(--st-border-strong);
+}
+
+/* ---------------------------------------------------------------------
+ * 15. Dashboard (#dashboard, .feeds, .news)
+ *      Templates: user/dashboard/dashboard.tmpl, feeds.tmpl, issues.tmpl
+ * ------------------------------------------------------------------- */
+#dashboard,
+.dashboard {
+  padding-top: 8px;
+}
+
+.dashboard.feeds .news .ui.avatar,
+.dashboard.feeds .news .avatar { box-shadow: 0 0 0 1px var(--st-border-strong); }
+
+.dashboard .news > .ui.right.rail,
+.dashboard .news .ui.fluid.card,
+.dashboard .filter.menu,
+.dashboard.feeds .my.repos.list,
+.dashboard.feeds .ui.repo-list,
+.dashboard.feeds .ui.list {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-lg) !important;
+  padding: 8px !important;
+  backdrop-filter: blur(var(--st-glass-blur));
+  -webkit-backdrop-filter: blur(var(--st-glass-blur));
+}
+
+.dashboard.feeds .my.repos.list .item,
+.dashboard.feeds .ui.list > .item {
+  color: var(--st-text) !important;
+  border-radius: var(--st-radius-sm) !important;
+  transition: background var(--st-dur-fast) var(--st-ease),
+              transform var(--st-dur-fast) var(--st-ease);
+  padding: 8px 10px !important;
+}
+.dashboard.feeds .my.repos.list .item:hover,
+.dashboard.feeds .ui.list > .item:hover {
+  background: rgba(207, 188, 255, 0.06) !important;
+  transform: translateX(2px);
+}
+
+.dashboard .news .news-item,
+.dashboard.feeds .news .ui.feed > .event {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-md) !important;
+  padding: 14px 16px !important;
+  margin-bottom: 10px;
+  transition: transform var(--st-dur) var(--st-ease),
+              box-shadow var(--st-dur) var(--st-ease),
+              border-color var(--st-dur) var(--st-ease);
+}
+.dashboard.feeds .news .ui.feed > .event:hover {
+  transform: translateY(-2px);
+  border-color: rgba(207, 188, 255, 0.25) !important;
+  box-shadow: var(--st-shadow-sm), var(--st-shadow-glow);
+}
+
+/* Stat-card style helpers (used by .ui.statistics) */
+.ui.statistics .statistic > .value,
+.ui.statistic > .value {
+  color: var(--st-text) !important;
+  font-weight: 800;
+  letter-spacing: var(--st-tracking-tight);
+}
+.ui.statistics .statistic > .label,
+.ui.statistic > .label {
+  color: var(--st-text-subtle) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+}
+
+/* ---------------------------------------------------------------------
+ * 16. Repository pages
+ *      Templates: repo/header.tmpl, repo/home.tmpl, repo/issue/*, repo/diff/*
+ * ------------------------------------------------------------------- */
+.repository .header-wrapper,
+.repository.file.list .header.column,
+.repository .ui.tabs.container,
+.repository .ui.tabular.menu {
+  background: transparent !important;
+}
+
+.repository .ui.tabular.menu .item.active {
+  color: var(--st-primary) !important;
+  border-color: var(--st-primary) !important;
+}
+.repository .header-wrapper .ui.huge.breadcrumb a,
+.repository .ui.huge.breadcrumb a {
+  color: var(--st-text) !important;
+}
+.repository .header-wrapper .ui.huge.breadcrumb .divider {
+  color: var(--st-text-subtle) !important;
+}
+
+/* File browser rows */
+.repository.file.list #repo-files-table tr,
+.repository.file.list #repo-files-table {
+  background: transparent !important;
+}
+.repository.file.list #repo-files-table tr td {
+  border-top: 1px solid var(--st-border-soft) !important;
+}
+.repository.file.list #repo-files-table tr:hover td {
+  background: rgba(207, 188, 255, 0.04) !important;
+}
+
+/* Code view */
+.repository .file-content,
+.repository .non-diff-file-content,
+.repository .source {
+  background: var(--st-surface-low) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-md) !important;
+}
+
+/* Diff */
+.repository .diff-file-box,
+.repository .diff-box,
+.repository .diff-file {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-md) !important;
+  overflow: hidden;
+}
+.repository .diff-file-header,
+.repository .diff-header { background: rgba(255, 255, 255, 0.03) !important; border-bottom: 1px solid var(--st-border) !important; color: var(--st-text); }
+
+/* Issues / pulls list */
+.repository.issues .issue.list .item,
+.repository.pulls .issue.list .item,
+.issue.list > .item {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-md) !important;
+  margin-bottom: 8px;
+  padding: 12px 16px !important;
+  transition: transform var(--st-dur-fast) var(--st-ease),
+              border-color var(--st-dur-fast) var(--st-ease);
+}
+.repository.issues .issue.list .item:hover,
+.repository.pulls .issue.list .item:hover,
+.issue.list > .item:hover {
+  border-color: rgba(207, 188, 255, 0.30) !important;
+  transform: translateX(2px);
+}
+
+/* Comments / timeline */
+.repository .comment.box,
+.repository .timeline .comment {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-md) !important;
+}
+.repository .comment.box .comment-header,
+.repository .timeline .comment-header { background: rgba(255, 255, 255, 0.03) !important; border-bottom: 1px solid var(--st-border) !important; }
+
+/* ---------------------------------------------------------------------
+ * 17. User profile & user settings
+ * ------------------------------------------------------------------- */
+.user.profile .ui.card,
+.user.profile .ui.repository.list .item,
+.user .ui.repository.list .item {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-md) !important;
+}
+
+/* ---------------------------------------------------------------------
+ * 18. Admin panel
+ * ------------------------------------------------------------------- */
+.admin .ui.attached.header,
+.admin .ui.attached.segment {
+  border-color: var(--st-border) !important;
+}
+.admin .ui.list > .item .header,
+.admin .ui.statistics .statistic > .value { color: var(--st-text) !important; }
+
+/* ---------------------------------------------------------------------
+ * 19. Auth pages (login, signup, install, forgot/reset)
+ * ------------------------------------------------------------------- */
+.user.signin .ui.container,
+.user.signup .ui.container,
+.user.activate .ui.container,
+.user.forgot.password .ui.container,
+.user.reset.password .ui.container,
+.install .ui.container {
+  margin-top: 36px;
+}
+
+.user.signin .ui.form,
+.user.signup .ui.form,
+.user.activate .ui.form,
+.user.forgot.password .ui.form,
+.user.reset.password .ui.form {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-lg) !important;
+  padding: 28px !important;
+  box-shadow: var(--st-shadow-md), var(--st-inner-glow);
+  backdrop-filter: blur(var(--st-glass-blur));
+  -webkit-backdrop-filter: blur(var(--st-glass-blur));
+  animation: stitchFadeUp var(--st-dur-slow) var(--st-ease);
+}
+
+/* Install page wide form */
+.install .ui.form,
+.install form.ui.form {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-lg) !important;
+  padding: 24px 28px !important;
+  box-shadow: var(--st-shadow-md), var(--st-inner-glow);
+  backdrop-filter: blur(var(--st-glass-blur));
+  -webkit-backdrop-filter: blur(var(--st-glass-blur));
+}
+
+/* ---------------------------------------------------------------------
+ * 20. Explore
+ * ------------------------------------------------------------------- */
+.explore .ui.repository.list .item,
+.explore .ui.user.list .item {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-md) !important;
+  padding: 14px 16px !important;
+  margin-bottom: 10px;
+  transition: transform var(--st-dur) var(--st-ease),
+              border-color var(--st-dur) var(--st-ease),
+              box-shadow var(--st-dur) var(--st-ease);
+}
+.explore .ui.repository.list .item:hover,
+.explore .ui.user.list .item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(207, 188, 255, 0.30) !important;
+  box-shadow: var(--st-shadow-sm), var(--st-shadow-glow);
+}
+.explore .ui.repository.list .item .header,
+.explore .ui.user.list .item .header { color: var(--st-text) !important; }
+.explore .ui.repository.list .item .description,
+.explore .ui.user.list .item .description { color: var(--st-text-muted) !important; }
+
+/* ---------------------------------------------------------------------
+ * 21. Pagination
+ * ------------------------------------------------------------------- */
+.ui.pagination.menu {
+  background: var(--st-surface) !important;
+  border: 1px solid var(--st-border) !important;
+  border-radius: var(--st-radius-md) !important;
+  overflow: hidden;
+}
+.ui.pagination.menu .item {
+  color: var(--st-text-muted) !important;
+  border-color: var(--st-border) !important;
+}
+.ui.pagination.menu .item.active {
+  background: rgba(207, 188, 255, 0.12) !important;
+  color: var(--st-primary) !important;
+}
+.ui.pagination.menu .item:hover { background: rgba(255, 255, 255, 0.04) !important; color: var(--st-text) !important; }
+
+/* ---------------------------------------------------------------------
+ * 22. Empty / placeholder / loading
+ * ------------------------------------------------------------------- */
+.ui.placeholder.segment {
+  background: var(--st-surface) !important;
+  border: 1px dashed var(--st-border-strong) !important;
+  border-radius: var(--st-radius-lg) !important;
+}
+.ui.placeholder .line,
+.ui.placeholder .image {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 100%) !important;
+  animation: stitchShimmer 1.6s var(--st-ease) infinite;
+}
+.ui.loader::before { border-color: var(--st-border-strong) !important; }
+.ui.loader::after { border-top-color: var(--st-primary) !important; border-right-color: var(--st-primary) !important; }
+
+/* ---------------------------------------------------------------------
+ * 23. Animations
+ * ------------------------------------------------------------------- */
+@keyframes stitchFadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes stitchScaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes stitchShimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+main, .full.height > .ui.container,
+.full.height > .ui.fluid.container {
+  animation: stitchFadeUp var(--st-dur-slow) var(--st-ease);
+}
+
+/* ---------------------------------------------------------------------
+ * 24. Reduced motion
+ * ------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------------------------------------------------------------
+ * 25. Responsive tweaks
+ * ------------------------------------------------------------------- */
+@media (max-width: 991px) {
+  body { min-width: 0 !important; }
+  .ui.container:not(.fluid) { width: auto !important; padding: 0 16px; }
+  .following.bar .top.menu { flex-wrap: wrap; }
+}
+@media (max-width: 767px) {
+  .ui.segment, .ui.card, .ui.cards > .card { border-radius: var(--st-radius-md) !important; }
+  .ui.modal { border-radius: var(--st-radius-md) !important; }
+}
