@@ -1,0 +1,20 @@
+{{/* CodeForge pagination */}}
+{{with .Page}}
+	{{if gt .TotalPages 1}}
+		<div class="cf-pagination cf-mt-6" style="justify-content:center;flex-wrap:wrap;">
+			<a class="cf-pagination__item {{if not .HasPrevious}}is-disabled{{end}}" {{if .HasPrevious}}href="{{$.Link}}?page={{.Previous}}&q={{$.Keyword}}"{{end}}>
+				&larr; {{$.i18n.Tr "repo.issues.previous"}}
+			</a>
+			{{range .Pages}}
+				{{if eq .Num -1}}
+					<span class="cf-pagination__item is-disabled">&hellip;</span>
+				{{else}}
+					<a class="cf-pagination__item {{if .IsCurrent}}is-active{{end}}" {{if not .IsCurrent}}href="{{$.Link}}?page={{.Num}}&q={{$.Keyword}}"{{end}}>{{.Num}}</a>
+				{{end}}
+			{{end}}
+			<a class="cf-pagination__item {{if not .HasNext}}is-disabled{{end}}" {{if .HasNext}}href="{{$.Link}}?page={{.Next}}&q={{$.Keyword}}"{{end}}>
+				{{$.i18n.Tr "repo.issues.next"}} &rarr;
+			</a>
+		</div>
+	{{end}}
+{{end}}

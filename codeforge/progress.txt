@@ -1,0 +1,65 @@
+CodeForge implementation progress
+=================================
+
+Plan: C:\Users\pc\.windsurf\plans\codeforge-from-scratch-d7ca25.md
+
+Phase 1 — Foundation                                  [DONE]
+  - codeforge/public/css/codeforge.css
+  - codeforge/public/js/codeforge.js
+  - codeforge/public/img/codeforge-mark.svg
+  - codeforge/public/img/codeforge-wordmark.svg
+  - codeforge/templates/base/head.tmpl
+  - codeforge/templates/base/footer.tmpl
+  - codeforge/templates/inject/{head,footer}.tmpl
+  Deployed: yes (after first restart)
+  Verified: pending until first deploy
+
+Phase 2 — Public + auth                               [DONE]
+  home.tmpl, install.tmpl, user/auth/* (8), status/{404,500}.tmpl
+  Verified: home/, login (200, cf-auth-card), signup (200), 404 (404).
+
+Phase 3 — Dashboard                                   [DONE]
+  user/dashboard/{dashboard,feeds,issues,navbar}.tmpl
+  Verified: /issues, /pulls, / -> 200.
+
+Phase 4 — Explore                                     [DONE]
+  explore/{repos,users,organizations,navbar,search,repo_list,page}.tmpl
+  Verified: /explore/{repos,users,organizations} -> 200.
+
+Phase 5 — User profile + settings                     [DONE]
+  user/profile.tmpl, user/settings/navbar.tmpl
+  Verified: HTTP 200, branding present.
+
+Phase 6 — Repository core                             [DONE]
+  repo/{header,branch_dropdown,home,view_list,view_file,
+        bare,commits,commits_table,create,migrate,
+        forks,watchers,user_cards}.tmpl
+  CSS section 14 added (cf-repo-header, cf-repo-tabs, cf-repo-summary,
+  cf-repo-stats, cf-repo-toolbar, cf-branch-dropdown, cf-clone-panel,
+  cf-file-browser, cf-file-view, cf-code-table, cf-quickstart,
+  cf-empty-state, cf-commits, cf-sha, cf-repo-create, cf-field,
+  cf-section-head, cf-fork-list, cf-user-cards, cf-pagination, cf-chip).
+  Verified against live local-gogs (after SQLite install + seed repo):
+    /cfadmin/hello-codeforge           -> 200 (8/8 cf-* needles)
+    /cfadmin/hello-codeforge/commits/master -> 200 (cf-commits,cf-sha)
+    /cfadmin/hello-codeforge/forks     -> 200 (cf-fork-list)
+    /cfadmin/hello-codeforge/watchers  -> 200 (cf-user-cards)
+    /cfadmin/hello-codeforge/stars     -> 200 (cf-user-cards)
+    /cfadmin/hello-codeforge/src/master/README.md -> 200 (cf-file-view)
+    /cfadmin/empty-repo                -> 200 (cf-repo--bare,cf-quickstart)
+    /repo/create                       -> 200 (cf-repo-create)
+    /repo/migrate                      -> 200 (cf-repo-create--migrate)
+  No template/runtime errors in docker logs during verification.
+  Note: installer also had to be completed for first-time verification
+  (SQLite, admin=cfadmin / pwd=cfadmin1234). Fixed permission on
+  /data/gogs/conf/app.ini (chown git:git) before installer could write.
+
+Phase 7 — Diffs + editor                              [TODO]
+Phase 8 — Issues + PRs + releases                     [TODO]
+Phase 9 — Repo settings + webhooks + wiki             [TODO]
+Phase 10 — Organizations                              [TODO]
+Phase 11 — Admin panel                                [TODO]
+Phase 12 — Email templates                            [TODO]
+Phase 13 — Branding pass (app.ini + locale)           [TODO]
+Phase 14 — Theme polish (light + offline fonts)       [TODO]
+Phase 15 — Verify + final summary                     [TODO]

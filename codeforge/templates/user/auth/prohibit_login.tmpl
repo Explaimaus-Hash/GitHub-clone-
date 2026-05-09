@@ -1,0 +1,17 @@
+{{template "base/head" .}}
+<main class="cf-auth-page user activate">
+	<div class="cf-auth-page__inner cf-auth-page__inner--narrow">
+		<section class="cf-auth-card">
+			<header class="cf-auth-card__header">
+				<div class="cf-auth-card__icon" style="background:rgba(248,113,113,0.16);color:#ffb4ab;border-color:rgba(248,113,113,0.4)">
+					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+				</div>
+				<h1>{{.i18n.Tr "auth.prohibit_login"}}</h1>
+			</header>
+			<div class="cf-auth-card__body">
+				<p class="cf-mute">{{.i18n.Tr "auth.prohibit_login_desc"}}</p>
+			</div>
+		</section>
+	</div>
+</main>
+{{template "base/footer" .}}

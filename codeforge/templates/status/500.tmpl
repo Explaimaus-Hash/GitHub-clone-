@@ -1,0 +1,19 @@
+{{template "base/head" .}}
+<main class="cf-status-page">
+	<div class="cf-status-page__inner">
+		<div class="cf-status-page__code cf-status-page__code--err">500</div>
+		<h1>Something went sideways</h1>
+		<p class="cf-mute">An unexpected error occurred while processing your request.</p>
+		{{if .ErrorMsg}}
+			<pre class="cf-status-page__detail" role="alert">{{.ErrorMsg}}</pre>
+		{{end}}
+		{{if .IsAdmin}}
+			<p class="cf-subtle cf-mono cf-mt-2">{{AppName}} {{AppVer}}</p>
+		{{end}}
+		<div class="cf-flex cf-gap-2 cf-mt-6 cf-justify-center" style="justify-content:center;flex-wrap:wrap;">
+			<a class="cf-btn cf-btn--primary" href="{{AppSubURL}}/">Back to home</a>
+			<a class="cf-btn cf-btn--ghost" target="_blank" rel="noopener noreferrer" href="https://github.com/gogs/gogs/issues/new">Report an issue</a>
+		</div>
+	</div>
+</main>
+{{template "base/footer" .}}

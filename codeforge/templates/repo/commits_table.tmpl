@@ -1,0 +1,74 @@
+<div class="cf-commits">
+	<header class="cf-commits__header ui top attached header">
+		<h3 class="cf-commits__title">
+			{{if .PageIsCommits}}
+				<i class="octicon octicon-history"></i> {{.i18n.Tr "repo.commits.commit_history"}}
+			{{else}}
+				<i class="octicon octicon-history"></i> {{.CommitsCount}} {{.i18n.Tr "repo.commits.commits"}}
+			{{end}}
+		</h3>
+		{{if .PageIsCommits}}
+			<form class="cf-commits__search" action="{{.RepoLink}}/commits/{{.BranchName}}/search">
+				<div class="cf-commits__search-input ui tiny search input">
+					<input name="q" placeholder="{{.i18n.Tr "repo.commits.search"}}" value="{{.Keyword}}" autofocus>
+				</div>
+				<button class="cf-btn cf-btn--primary ui black tiny button">{{.i18n.Tr "repo.commits.find"}}</button>
+			</form>
+		{{else if .IsDiffCompare}}
+			<div class="cf-commits__compare">
+				<a href="{{$.CommitRepoLink}}/commit/{{.BeforeCommitID}}" class="cf-sha ui green sha label">{{ShortSHA1 .BeforeCommitID}}</a>
+				<span class="cf-commits__compare-sep">…</span>
+				<a href="{{$.CommitRepoLink}}/commit/{{.AfterCommitID}}" class="cf-sha ui green sha label">{{ShortSHA1 .AfterCommitID}}</a>
+			</div>
+		{{end}}
+	</header>
+
+	{{if .Commits}}
+		<div class="cf-commits__body ui unstackable attached table segment">
+			<table id="commits-table" class="cf-commits__table ui unstackable very basic striped fixed table single line">
+				<thead>
+					<tr>
+						<th class="four wide">{{.i18n.Tr "repo.commits.author"}}</th>
+						<th class="nine wide message"><span class="sha">SHA1</span> {{.i18n.Tr "repo.commits.message"}}</th>
+						<th class="three wide right aligned">{{.i18n.Tr "repo.commits.date"}}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{range .Commits}}
+						<tr class="cf-commits__row">
+							<td class="cf-commits__author author">
+								{{if .User}}
+									<img class="cf-commits__avatar ui avatar image" src="{{.User.AvatarURLPath}}" alt="">
+									<a href="{{AppSubURL}}/{{.User.Name}}">{{.Author.Name}}</a>
+								{{else}}
+									<img class="cf-commits__avatar ui avatar image" src="{{AvatarLink .Author.Email}}" alt="">
+									<span>{{.Author.Name}}</span>
+								{{end}}
+							</td>
+							<td class="cf-commits__message message collapsing">
+								{{if not (and $.Username $.Reponame)}}
+									<span class="cf-sha ui sha label">{{ShortSHA1 .ID.String}}</span>
+								{{else}}
+									<a rel="nofollow" class="cf-sha ui sha label" href="{{AppSubURL}}/{{$.Username}}/{{$.Reponame}}/commit/{{.ID}}">{{ShortSHA1 .ID.String}}</a>
+								{{end}}
+								<span class="cf-commits__summary {{if gt .ParentsCount 1}}grey text {{end}}has-emoji">{{RenderCommitMessage false .Summary $.RepoLink $.Repository.ComposeMetas | Str2HTML}}</span>
+							</td>
+							<td class="cf-commits__date grey text right aligned">{{TimeSince .Author.When $.Lang}}</td>
+						</tr>
+					{{end}}
+				</tbody>
+			</table>
+		</div>
+	{{end}}
+
+	{{if or .HasPrevious .HasNext}}
+		<nav class="cf-commits__pager center" aria-label="{{$.i18n.Tr "repo.commits.commit_history"}}">
+			<a class="cf-btn cf-btn--ghost ui small button {{if not .HasPrevious}}disabled{{end}}" {{if .HasPrevious}}href="{{$.RepoLink}}/commits/{{$.BranchName}}{{if $.FileName}}/{{$.FileName}}{{end}}?page={{.PreviousPage}}&pageSize={{.PageSize}}"{{end}}>
+				<i class="octicon octicon-chevron-left"></i> {{$.i18n.Tr "repo.commits.newer"}}
+			</a>
+			<a class="cf-btn cf-btn--ghost ui small button {{if not .HasNext}}disabled{{end}}" {{if .HasNext}}href="{{$.RepoLink}}/commits/{{$.BranchName}}{{if $.FileName}}/{{$.FileName}}{{end}}?page={{.NextPage}}&pageSize={{.PageSize}}"{{end}}>
+				{{$.i18n.Tr "repo.commits.older"}} <i class="octicon octicon-chevron-right"></i>
+			</a>
+		</nav>
+	{{end}}
+</div>

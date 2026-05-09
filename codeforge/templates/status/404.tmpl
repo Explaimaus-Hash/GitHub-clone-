@@ -1,0 +1,14 @@
+{{template "base/head" .}}
+<main class="cf-status-page">
+	<div class="cf-status-page__inner">
+		<div class="cf-status-page__code">404</div>
+		<h1>Not found</h1>
+		<p class="cf-mute">The page, repository, or resource you're looking for doesn't exist or has been moved.</p>
+		<div class="cf-flex cf-gap-2 cf-mt-6 cf-justify-center" style="justify-content:center;flex-wrap:wrap;">
+			<a class="cf-btn cf-btn--primary" href="{{AppSubURL}}/">Back to home</a>
+			<a class="cf-btn cf-btn--ghost" href="{{AppSubURL}}/explore/repos">Explore repositories</a>
+			<a class="cf-btn cf-btn--ghost" target="_blank" rel="noopener noreferrer" href="https://github.com/gogs/gogs/issues/new">Report an issue</a>
+		</div>
+	</div>
+</main>
+{{template "base/footer" .}}

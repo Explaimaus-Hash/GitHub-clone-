@@ -1,0 +1,57 @@
+{{template "base/head" .}}
+<main class="cf-repo cf-repo--bare repository quickstart">
+	{{template "repo/header" .}}
+	<div class="cf-repo__inner ui container">
+		{{template "base/alert" .}}
+		{{if .IsRepositoryWriter}}
+			<section class="cf-quickstart">
+				<header class="cf-quickstart__header">
+					<h2>{{.i18n.Tr "repo.quick_guide"}}</h2>
+					<p>{{.i18n.Tr "repo.clone_helper" "http://git-scm.com/book/en/Git-Basics-Getting-a-Git-Repository" | Str2HTML}}</p>
+				</header>
+
+				<article class="cf-quickstart__step cf-card">
+					<h3 class="cf-quickstart__step-title">{{.i18n.Tr "repo.clone_this_repo"}}</h3>
+					<div class="cf-clone-panel ui action small input">
+						{{if not $.DisableHTTP}}
+							<button class="cf-clone-panel__protocol ui basic clone button" id="repo-clone-https" data-link="{{.CloneLink.HTTPS}}">{{if UseHTTPS}}HTTPS{{else}}HTTP{{end}}</button>
+						{{end}}
+						{{if not $.DisableSSH}}
+							<button class="cf-clone-panel__protocol ui basic clone button" id="repo-clone-ssh" data-link="{{.CloneLink.SSH}}">SSH</button>
+						{{end}}
+						<input class="cf-clone-panel__url" id="repo-clone-url" value="{{if not $.DisableHTTP}}{{$.CloneLink.HTTPS}}{{else}}{{$.CloneLink.SSH}}{{end}}" readonly>
+						<button class="cf-clone-panel__copy ui basic button poping up clipboard" id="clipboard-btn" data-original="{{.i18n.Tr "repo.copy_link"}}" data-success="{{.i18n.Tr "repo.copy_link_success"}}" data-error="{{.i18n.Tr "repo.copy_link_error"}}" data-content="{{.i18n.Tr "repo.copy_link"}}" data-variation="inverted tiny" data-clipboard-target="#repo-clone-url">
+							<i class="octicon octicon-clippy"></i>
+						</button>
+					</div>
+				</article>
+
+				<article class="cf-quickstart__step cf-card">
+					<h3 class="cf-quickstart__step-title">{{.i18n.Tr "repo.create_new_repo_command"}}</h3>
+					<div class="cf-quickstart__code markdown">
+						<pre><code>touch README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin <span class="clone-url">{{if $.DisableSSH}}{{$.CloneLink.HTTPS}}{{else}}{{$.CloneLink.SSH}}{{end}}</span>
+git push -u origin {{ $.Repository.DefaultBranch }}</code></pre>
+					</div>
+				</article>
+
+				<article class="cf-quickstart__step cf-card">
+					<h3 class="cf-quickstart__step-title">{{.i18n.Tr "repo.push_exist_repo"}}</h3>
+					<div class="cf-quickstart__code markdown">
+						<pre><code>git remote add origin <span class="clone-url">{{if $.DisableSSH}}{{$.CloneLink.HTTPS}}{{else}}{{$.CloneLink.SSH}}{{end}}</span>
+git push -u origin {{ $.Repository.DefaultBranch }}</code></pre>
+					</div>
+				</article>
+			</section>
+		{{else}}
+			<div class="cf-empty-state cf-card">
+				<i class="cf-empty-state__icon octicon octicon-repo"></i>
+				<p class="cf-empty-state__text">{{.i18n.Tr "repo.bare_message"}}</p>
+			</div>
+		{{end}}
+	</div>
+</main>
+{{template "base/footer" .}}

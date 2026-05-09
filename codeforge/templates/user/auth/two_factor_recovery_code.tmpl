@@ -1,0 +1,27 @@
+{{template "base/head" .}}
+<main class="cf-auth-page user signin two-factor">
+	<div class="cf-auth-page__inner cf-auth-page__inner--narrow">
+		<section class="cf-auth-card">
+			<header class="cf-auth-card__header">
+				<div class="cf-auth-card__icon">
+					<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L3 7 v6 c0 5 4 9 9 9 s9-4 9-9 V7 z"/><path d="M9 12l2 2 4-4"/></svg>
+				</div>
+				<h1>{{.i18n.Tr "auth.login_two_factor_recovery"}}</h1>
+				<p class="cf-mute">Enter one of the recovery codes generated when you enabled two-factor.</p>
+			</header>
+			<form class="ui form cf-auth-card__body" action="{{.Link}}" method="post">
+				{{.CSRFTokenHTML}}
+				{{template "base/alert" .}}
+				<div class="cf-field">
+					<label class="cf-field__label" for="recovery_code">{{.i18n.Tr "auth.login_two_factor_recovery_code"}}</label>
+					<input id="recovery_code" class="cf-input cf-mono" name="recovery_code" autofocus required>
+				</div>
+				<button class="cf-btn cf-btn--primary cf-btn--block cf-mt-2" type="submit">{{.i18n.Tr "settings.two_factor_verify"}}</button>
+				<p class="cf-text-center cf-mute cf-mt-4">
+					<a href="{{AppSubURL}}/user/login/two_factor">{{.i18n.Tr "auth.login_two_factor_enter_passcode"}}</a>
+				</p>
+			</form>
+		</section>
+	</div>
+</main>
+{{template "base/footer" .}}

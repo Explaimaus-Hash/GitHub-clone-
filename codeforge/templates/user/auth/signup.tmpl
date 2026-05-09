@@ -1,0 +1,70 @@
+{{template "base/head" .}}
+<main class="cf-auth-page user signup">
+	<div class="cf-auth-page__inner">
+		<aside class="cf-auth-page__aside" aria-hidden="true">
+			<a class="cf-auth-page__brand" href="{{AppSubURL}}/">
+				<img src="{{AppSubURL}}/img/codeforge-mark.svg" alt="" width="32" height="32">
+				<span>{{AppName}}</span>
+			</a>
+			<h2 class="cf-auth-page__pitch">Make your forge yours.</h2>
+			<p class="cf-auth-page__copy">Create an account to host repositories, collaborate on issues, and ship releases on your own infrastructure.</p>
+			<ul class="cf-auth-page__bullets">
+				<li><span class="cf-auth-bullet"></span> Unlimited public &amp; private repos</li>
+				<li><span class="cf-auth-bullet"></span> Pull requests &amp; code review</li>
+				<li><span class="cf-auth-bullet"></span> Built-in wikis &amp; releases</li>
+			</ul>
+		</aside>
+
+		<section class="cf-auth-card">
+			<header class="cf-auth-card__header">
+				<h1>{{.i18n.Tr "sign_up"}}</h1>
+				<p class="cf-mute">Create your CodeForge account</p>
+			</header>
+			<form class="ui form cf-auth-card__body" action="{{.Link}}" method="post" novalidate>
+				{{.CSRFTokenHTML}}
+				{{template "base/alert" .}}
+
+				{{if .DisableRegistration}}
+					<div class="cf-empty">
+						<div class="cf-empty__icon">&#9888;</div>
+						<div class="cf-empty__title">Registration disabled</div>
+						<p class="cf-mute">{{.i18n.Tr "auth.disable_register_prompt"}}</p>
+					</div>
+				{{else}}
+					<div class="cf-field {{if .Err_UserName}}is-error{{end}}">
+						<label class="cf-field__label" for="user_name">{{.i18n.Tr "username"}}</label>
+						<input id="user_name" class="cf-input" name="user_name" value="{{.user_name}}" autocomplete="username" autofocus required>
+					</div>
+					<div class="cf-field {{if .Err_Email}}is-error{{end}}">
+						<label class="cf-field__label" for="email">{{.i18n.Tr "email"}}</label>
+						<input id="email" class="cf-input" name="email" type="email" value="{{.email}}" autocomplete="email" required>
+					</div>
+					<div class="cf-field {{if .Err_Password}}is-error{{end}}">
+						<label class="cf-field__label" for="password">{{.i18n.Tr "password"}}</label>
+						<input id="password" class="cf-input" name="password" type="password" value="{{.password}}" autocomplete="new-password" required>
+					</div>
+					<div class="cf-field {{if .Err_Password}}is-error{{end}}">
+						<label class="cf-field__label" for="retype">{{.i18n.Tr "re_type"}}</label>
+						<input id="retype" class="cf-input" name="retype" type="password" value="{{.retype}}" autocomplete="new-password" required>
+					</div>
+
+					{{if .EnableCaptcha}}
+						<div class="cf-field">
+							{{.Captcha.CreateHtml}}
+						</div>
+						<div class="cf-field {{if .Err_Captcha}}is-error{{end}}">
+							<label class="cf-field__label" for="captcha">{{.i18n.Tr "captcha"}}</label>
+							<input id="captcha" class="cf-input" name="captcha" value="{{.captcha}}" autocomplete="off">
+						</div>
+					{{end}}
+
+					<button class="cf-btn cf-btn--primary cf-btn--block cf-btn--lg cf-mt-2" type="submit">{{.i18n.Tr "auth.create_new_account"}}</button>
+					<p class="cf-text-center cf-mute cf-mt-4">
+						<a href="{{AppSubURL}}/user/login">{{.i18n.Tr "auth.register_hepler_msg"}}</a>
+					</p>
+				{{end}}
+			</form>
+		</section>
+	</div>
+</main>
+{{template "base/footer" .}}

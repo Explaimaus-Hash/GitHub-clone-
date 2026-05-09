@@ -1,0 +1,47 @@
+{{template "base/head" .}}
+<div class="repository diff cf-diff-page">
+	{{template "repo/header" .}}
+	<div class="ui container {{if .IsSplitStyle}}fluid padded{{end}}">
+		{{if .IsDiffCompare }}
+			{{template "repo/commits_table" .}}
+		{{else}}
+			<div class="cf-diff-commit cf-card">
+				<div class="cf-diff-commit__top">
+					<div class="cf-diff-commit__message">
+						{{RenderCommitMessage true .Commit.Message $.RepoLink $.Repository.ComposeMetas | Str2HTML}}
+					</div>
+					<a class="cf-btn cf-btn--ghost" href="{{EscapePound .SourcePath}}">
+						<i class="octicon octicon-file-code"></i>
+						{{.i18n.Tr "repo.diff.browse_source"}}
+					</a>
+				</div>
+				<div class="cf-diff-commit__meta">
+					<div class="cf-diff-commit__author">
+						{{if .Author}}
+							<img class="cf-diff-commit__avatar" src="{{.Author.AvatarURLPath}}" alt="">
+							<a href="{{.Author.HomeURLPath}}"><strong>{{.Commit.Author.Name}}</strong></a>
+							{{if .IsLogged}}<span class="cf-diff-commit__email">&lt;{{.Commit.Author.Email}}&gt;</span>{{end}}
+						{{else}}
+							<img class="cf-diff-commit__avatar" src="{{AvatarLink .Commit.Author.Email}}" alt="">
+							<strong>{{.Commit.Author.Name}}</strong>
+						{{end}}
+						<span class="cf-diff-commit__time text grey" id="authored-time">{{TimeSince .Commit.Author.When $.Lang}}</span>
+					</div>
+					<div class="cf-diff-commit__refs">
+						{{if .Parents}}
+							<span class="cf-diff-commit__ref-label">{{.i18n.Tr "repo.diff.parent"}}</span>
+							{{range .Parents}}
+								<a class="cf-sha ui blue sha label" href="{{$.RepoLink}}/commit/{{.}}">{{ShortSHA1 .}}</a>
+							{{end}}
+						{{end}}
+						<span class="cf-diff-commit__ref-label">{{.i18n.Tr "repo.diff.commit"}}</span>
+						<span class="cf-sha ui blue sha label">{{ShortSHA1 .CommitID}}</span>
+					</div>
+				</div>
+			</div>
+		{{end}}
+
+		{{template "repo/diff/box" .}}
+	</div>
+</div>
+{{template "base/footer" .}}

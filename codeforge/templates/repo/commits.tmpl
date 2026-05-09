@@ -1,0 +1,11 @@
+{{template "base/head" .}}
+<main class="cf-repo cf-repo--commits repository commits">
+	{{template "repo/header" .}}
+	<div class="cf-repo__inner ui container">
+		<section class="cf-repo-toolbar ui secondary menu">
+			{{template "repo/branch_dropdown" .}}
+		</section>
+		{{template "repo/commits_table" .}}
+	</div>
+</main>
+{{template "base/footer" .}}

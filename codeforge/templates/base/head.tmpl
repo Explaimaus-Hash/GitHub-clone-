@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="{{.Lang}}" data-cf-app="codeforge">
+<head data-suburl="{{AppSubURL}}">
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+	{{if not .PageIsAdmin}}
+		<meta name="author" content="{{if .Repository}}{{.Owner.Name}}{{else}}CodeForge{{end}}" />
+		<meta name="description" content="{{if .Repository}}{{.Repository.Name}}{{if .Repository.Description}} - {{.Repository.Description}}{{end}}{{else}}CodeForge — a self-hosted Git workspace.{{end}}" />
+		<meta name="keywords" content="codeforge, git, self-hosted, source-control, devhub">
+	{{end}}
+	<meta name="referrer" content="no-referrer" />
+	<meta name="_csrf" content="{{.CSRFToken}}" />
+	<meta name="_suburl" content="{{AppSubURL}}" />
+
+	<!-- Open Graph -->
+	{{if .PageIsAdmin}}
+	{{else if .PageIsUserProfile}}
+		<meta property="og:url" content="{{.Owner.HTMLURL}}" />
+		<meta property="og:type" content="profile" />
+		<meta property="og:title" content="{{.Owner.Name}}{{if .Owner.FullName}} ({{.Owner.FullName}}){{end}}">
+		<meta property="og:description" content="{{.Owner.Name}} on CodeForge.">
+		<meta property="og:image" content="{{.Owner.AvatarURL}}" />
+	{{else if .Repository}}
+		<meta property="og:url" content="{{.Repository.HTMLURL}}" />
+		<meta property="og:type" content="object" />
+		<meta property="og:title" content="{{.Repository.FullName}}">
+		<meta property="og:description" content="{{.Repository.Description}}">
+		<meta property="og:image" content="{{.Repository.Owner.AvatarURL}}" />
+	{{else}}
+		<meta property="og:url" content="{{AppURL}}" />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="{{AppName}}">
+		<meta property="og:description" content="CodeForge — a self-hosted Git workspace.">
+		<meta property="og:image" content="{{AppURL}}img/codeforge-mark.svg" />
+		<meta property="og:site_name" content="{{AppName}}">
+	{{end}}
+
+	<link rel="shortcut icon" href="{{AppSubURL}}/img/codeforge-mark.svg" type="image/svg+xml" />
+	<link rel="alternate icon" href="{{AppSubURL}}/img/favicon.png" />
+
+	<!-- jQuery (kept — required by Gogs widgets and legacy templates) -->
+	<script src="{{AppSubURL}}/js/jquery-3.7.1.min.js"></script>
+	<script src="{{AppSubURL}}/js/libs/jquery.are-you-sure.js"></script>
+
+	<!-- Icon fonts kept for legacy templates -->
+	<link rel="stylesheet" href="{{AppSubURL}}/assets/font-awesome-4.6.3/css/font-awesome.min.css">
+	<link rel="stylesheet" href="{{AppSubURL}}/assets/octicons-4.3.0/octicons.min.css">
+
+	{{if .IsIPythonNotebook}}
+		<script src="{{AppSubURL}}/plugins/notebookjs-0.4.2/notebook.min.js"></script>
+		<script src="{{AppSubURL}}/plugins/marked-0.8.1/marked.min.js"></script>
+	{{end}}
+
+	{{if .RequireSimpleMDE}}
+		<link rel="stylesheet" href="{{AppSubURL}}/plugins/simplemde-1.10.1/simplemde.min.css">
+		<script src="{{AppSubURL}}/plugins/simplemde-1.10.1/simplemde.min.js"></script>
+		<script src="{{AppSubURL}}/plugins/codemirror-5.17.0/addon/mode/loadmode.js"></script>
+		<script src="{{AppSubURL}}/plugins/codemirror-5.17.0/mode/meta.js"></script>
+		<script>CodeMirror.modeURL = "{{AppSubURL}}/plugins/codemirror-5.17.0/mode/%N/%N.js";</script>
+	{{end}}
+
+	<!-- Stylesheets: Semantic UI is kept for the JS-bound widgets (.ui.dropdown,
+	     .ui.checkbox, .ui.modal). gogs.min.css is the legacy skin. codeforge.css
+	     loads last and supersedes both visually. -->
+	<link rel="stylesheet" href="{{AppSubURL}}/css/semantic-2.4.2.min.css">
+	<link rel="stylesheet" href="{{AppSubURL}}/css/gogs.min.css?v={{BuildCommit}}">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+	<link rel="stylesheet" href="{{AppSubURL}}/css/codeforge.css">
+
+	<noscript>
+		<style>
+			.dropdown:hover > .menu { display: block; }
+			.ui.secondary.menu .dropdown.item > .menu { margin-top: 0; }
+		</style>
+	</noscript>
+
+	<!-- JavaScript -->
+	<script src="{{AppSubURL}}/js/semantic-2.4.2.min.js"></script>
+	<script src="{{AppSubURL}}/js/gogs.js?v={{BuildCommit}}"></script>
+	<script src="{{AppSubURL}}/js/codeforge.js" defer></script>
+
+	<title>{{if .Title}}{{.Title}} - {{end}}{{AppName}}</title>
+
+	<meta name="theme-color" content="#141218">
+
+	{{template "inject/head" .}}
+</head>
+<body class="cf-body">
+	<div class="full height">
+		<noscript>This website works better with JavaScript</noscript>
+
+		{{if not .PageIsInstall}}
+			<header class="cf-topbar" role="banner">
+				<button class="cf-btn cf-btn--ghost cf-btn--icon cf-hide-md" data-cf-drawer-toggle aria-label="Open menu" style="display:none">
+					<svg class="cf-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+				</button>
+
+				<a class="cf-topbar__brand" href="{{AppSubURL}}/" aria-label="{{AppName}} home">
+					<img src="{{AppSubURL}}/img/codeforge-mark.svg" alt="" width="26" height="26">
+					<span>{{AppName}}</span>
+				</a>
+
+				<nav class="cf-topbar__nav" aria-label="Primary">
+					{{if .IsLogged}}
+						<a class="{{if .PageIsDashboard}}is-active{{end}}" href="{{AppSubURL}}/">{{.i18n.Tr "dashboard"}}</a>
+						<a class="{{if .PageIsIssues}}is-active{{end}}" href="{{AppSubURL}}/issues">{{.i18n.Tr "issues"}}</a>
+						<a class="{{if .PageIsPulls}}is-active{{end}}" href="{{AppSubURL}}/pulls">{{.i18n.Tr "pull_requests"}}</a>
+					{{else}}
+						<a class="{{if .PageIsHome}}is-active{{end}}" href="{{AppSubURL}}/">{{.i18n.Tr "home"}}</a>
+					{{end}}
+					<a class="{{if .PageIsExplore}}is-active{{end}}" href="{{AppSubURL}}/explore/repos">{{.i18n.Tr "explore"}}</a>
+				</nav>
+
+				<div class="cf-topbar__spacer"></div>
+
+				<form class="cf-topbar__search cf-hide-sm" role="search" action="{{AppSubURL}}/explore/repos" method="get">
+					<svg class="cf-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+					<input type="search" name="q" placeholder="Search repositories…" data-cf-search aria-label="Search">
+					<span class="cf-kbd cf-hide-md">Ctrl K</span>
+				</form>
+
+				<div class="cf-topbar__right">
+					<button class="cf-btn cf-btn--ghost cf-btn--icon" data-cf-theme-toggle title="Toggle theme" aria-label="Toggle theme">
+						<svg class="cf-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+					</button>
+
+					{{if .IsLogged}}
+						<div class="ui dropdown cf-btn cf-btn--ghost cf-btn--icon" data-content="{{.i18n.Tr "create_new"}}" data-variation="tiny inverted" aria-label="{{.i18n.Tr "create_new"}}">
+							<svg class="cf-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+							<div class="menu">
+								<a class="item" href="{{AppSubURL}}/repo/create">
+									<i class="octicon octicon-plus"></i> {{.i18n.Tr "new_repo"}}
+								</a>
+								<a class="item" href="{{AppSubURL}}/repo/migrate">
+									<i class="octicon octicon-repo-clone"></i> {{.i18n.Tr "new_migrate"}}
+								</a>
+								{{if .LoggedUser.CanCreateOrganization}}
+									<a class="item" href="{{AppSubURL}}/org/create">
+										<i class="octicon octicon-organization"></i> {{.i18n.Tr "new_org"}}
+									</a>
+								{{end}}
+							</div>
+						</div>
+
+						<div class="ui dropdown" data-content="{{.i18n.Tr "user_profile_and_more"}}" data-variation="tiny inverted">
+							<button class="cf-btn cf-btn--ghost" type="button" aria-label="{{.i18n.Tr "user_profile_and_more"}}">
+								<span class="cf-avatar cf-avatar--sm">
+									<img src="{{.LoggedUser.AvatarURLPath}}" alt="">
+								</span>
+								<svg class="cf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+							</button>
+							<div class="menu" tabindex="-1">
+								<div class="header">
+									{{.i18n.Tr "signed_in_as"}} <strong>{{.LoggedUser.Name}}</strong>
+								</div>
+								<div class="divider"></div>
+								<a class="item" href="{{AppSubURL}}/{{.LoggedUser.Name}}">
+									<i class="octicon octicon-person"></i> {{.i18n.Tr "your_profile"}}
+								</a>
+								<a class="{{if .PageIsUserSettings}}active{{end}} item" href="{{AppSubURL}}/user/settings">
+									<i class="octicon octicon-settings"></i> {{.i18n.Tr "your_settings"}}
+								</a>
+								<a class="item" href="{{AppURL}}">
+									<i class="octicon octicon-question"></i> {{.i18n.Tr "help"}}
+								</a>
+								{{if .IsAdmin}}
+									<div class="divider"></div>
+									<a class="{{if .PageIsAdmin}}active{{end}} item" href="{{AppSubURL}}/admin">
+										<i class="icon settings"></i> {{.i18n.Tr "admin_panel"}}
+									</a>
+								{{end}}
+								<div class="divider"></div>
+								<form id="logout-form" class="item" action="{{AppSubURL}}/user/logout" method="POST">
+									{{.CSRFTokenHTML}}
+									<div class="submit-button" data-form="#logout-form">
+										<i class="octicon octicon-sign-out"></i> {{.i18n.Tr "sign_out"}}
+									</div>
+								</form>
+							</div>
+						</div>
+					{{else}}
+						{{if .ShowRegistrationButton}}
+							<a class="cf-btn cf-btn--ghost{{if .PageIsSignUp}} is-active{{end}}" href="{{AppSubURL}}/user/sign_up">{{.i18n.Tr "register"}}</a>
+						{{end}}
+						<a class="cf-btn cf-btn--primary{{if .PageIsSignIn}} is-active{{end}}" href="{{AppSubURL}}/user/login?redirect_to={{.Link}}">
+							<svg class="cf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+							{{.i18n.Tr "sign_in"}}
+						</a>
+					{{end}}
+				</div>
+			</header>
+		{{end}}
+
+		{{if .ServerNotice}}
+			<div class="ui container grid warning message" data-cf-flash data-cf-flash-duration="8000">
+				<div class="content">
+					{{.ServerNotice | Str2HTML}}
+				</div>
+			</div>
+		{{end}}
+{{/*
+	</div>
+</body>
+</html>
+*/}}

@@ -1,0 +1,164 @@
+{{if .DiffNotAvailable}}
+	<div class="cf-card cf-diff-empty">
+		<h4>{{.i18n.Tr "repo.diff.data_not_available"}}</h4>
+	</div>
+{{else}}
+	<div class="cf-diff-stats cf-card diff-detail-box diff-box">
+		<div class="cf-diff-stats__summary">
+			<i class="fa fa-retweet"></i>
+			{{.i18n.Tr "repo.diff.stats_desc" .Diff.NumFiles .Diff.TotalAdditions .Diff.TotalDeletions | Str2HTML}}
+			<div class="cf-diff-stats__actions">
+				<a class="cf-btn cf-btn--ghost ui tiny basic toggle button" href="?style={{if .IsSplitStyle}}unified{{else}}split{{end}}">{{if .IsSplitStyle}}{{.i18n.Tr "repo.diff.show_unified_view"}}{{else}}{{.i18n.Tr "repo.diff.show_split_view"}}{{end}}</a>
+				<a class="cf-btn cf-btn--ghost ui tiny basic toggle button" data-target="#diff-files">{{.i18n.Tr "repo.diff.show_diff_stats"}}</a>
+			</div>
+		</div>
+		<ol class="cf-diff-stats__files detail-files hide" id="diff-files">
+			{{range .Diff.Files}}
+				<li class="cf-diff-stats__file">
+					<div class="diff-counter count pull-right">
+						{{if not .IsBinary}}
+							<span class="add" data-line="{{.NumAdditions}}">{{.NumAdditions}}</span>
+							<span class="bar">
+								<span class="pull-left add"></span>
+								<span class="pull-left del"></span>
+							</span>
+							<span class="del" data-line="{{.NumDeletions}}">{{.NumDeletions}}</span>
+						{{else}}
+							<span>{{$.i18n.Tr "repo.diff.bin"}}</span>
+						{{end}}
+					</div>
+					<span class="status {{DiffFileTypeToStr .Type}} poping up" data-content="{{DiffFileTypeToStr .Type}}" data-variation="inverted tiny" data-position="right center">&nbsp;</span>
+					<a class="file" href="#diff-{{if .IsDeleted}}{{.OldIndex}}{{else}}{{.Index}}{{end}}">{{.Name}}</a>
+				</li>
+			{{end}}
+		</ol>
+	</div>
+
+	{{range $i, $file := .Diff.Files}}
+		{{if $file.IsIncomplete}}
+			<div class="cf-diff-file cf-card diff-file-box diff-box file-content">
+				<div class="cf-diff-file__header ui top attached normal header">
+					{{$.i18n.Tr "repo.diff.file_suppressed"}}
+					<div class="cf-diff-file__counter diff-counter count ui left">
+						<span class="add" data-line="{{.NumAdditions}}">+ {{.NumAdditions}}</span>
+						<span class="bar">
+							<span class="pull-left add"></span>
+							<span class="pull-left del"></span>
+						</span>
+						<span class="del" data-line="{{.NumDeletions}}">- {{.NumDeletions}}</span>
+					</div>
+					<span class="file">{{$file.Name}}</span>
+				</div>
+			</div>
+		{{else}}
+			<div class="cf-diff-file cf-card diff-file-box diff-box file-content {{TabSizeClass $.Editorconfig $file.Name}}" id="diff-{{if .IsDeleted}}{{.OldIndex}}{{else}}{{.Index}}{{end}}">
+				<div class="cf-diff-file__header ui top attached normal header">
+					<div class="cf-diff-file__counter diff-counter count ui left">
+						{{if $file.IsBinary}}
+							{{$.i18n.Tr "repo.diff.bin"}}
+						{{else}}
+							<span class="add" data-line="{{.NumAdditions}}">+ {{.NumAdditions}}</span>
+							<span class="bar">
+								<span class="pull-left add"></span>
+								<span class="pull-left del"></span>
+							</span>
+							<span class="del" data-line="{{.NumDeletions}}">- {{.NumDeletions}}</span>
+						{{end}}
+					</div>
+					<span class="file">{{if $file.IsRenamed}}{{$file.OldName}} &rarr; {{end}}{{$file.Name}}</span>
+					{{if not $file.IsSubmodule}}
+						<div class="cf-diff-file__actions">
+							{{if $file.IsDeleted}}
+								<a class="cf-btn cf-btn--ghost" rel="nofollow" href="{{EscapePound $.BeforeSourcePath}}/{{EscapePound .Name}}">{{$.i18n.Tr "repo.diff.view_file"}}</a>
+							{{else if $.SourcePath}}
+								<a class="cf-btn cf-btn--ghost" rel="nofollow" href="{{EscapePound $.SourcePath}}/{{EscapePound .Name}}">{{$.i18n.Tr "repo.diff.view_file"}}</a>
+							{{end}}
+						</div>
+					{{end}}
+				</div>
+				<div class="cf-diff-file__body ui unstackable attached table segment">
+					{{$isImage := false}}
+					{{if $file.IsDeleted}}
+						{{$isImage = (call $.IsImageFileByIndex $file.OldIndex)}}
+					{{else}}
+						{{$isImage = (call $.IsImageFile $file.Name)}}
+					{{end}}
+
+					{{if $isImage}}
+						<div class="cf-diff-file__image center">
+							{{if $file.IsDeleted}}
+								<img src="{{$.BeforeRawPath}}/{{EscapePound .Name}}">
+							{{else}}
+								<img src="{{$.RawPath}}/{{EscapePound .Name}}">
+							{{end}}
+						</div>
+					{{else}}
+						<div class="file-body file-code code-view code-diff cf-diff-table">
+							<table>
+								<tbody>
+									{{if $.IsSplitStyle}}
+										{{$highlightClass := $file.HighlightClass}}
+										{{range $j, $section := $file.Sections}}
+											{{range $k, $line := $section.Lines}}
+												<tr class="{{DiffLineTypeToStr .Type}}-code nl-{{$k}} ol-{{$k}}">
+													{{if eq .Type 4}}
+														<td class="lines-num"></td>
+														<td colspan="3"  class="lines-code">
+															<pre><code class="{{if $highlightClass}}language-{{$highlightClass}}{{else}}nohighlight{{end}}">{{$section.ComputedInlineDiffFor $line}}</code></pre>
+														</td>
+													{{else}}
+														<td class="lines-num lines-num-old" {{if $line.LeftLine}} id="diff-{{Sha1 $file.OldIndex}}L{{$line.LeftLine}}" data-line-number="{{$line.LeftLine}}"{{end}}>
+														</td>
+														<td class="lines-code halfwidth">
+															<pre><code class="wrap {{if $highlightClass}}language-{{$highlightClass}}{{else}}nohighlight{{end}}">{{if $line.LeftLine}}{{$section.ComputedInlineDiffFor $line}}{{end}}</code></pre>
+														</td>
+														<td class="lines-num lines-num-new" {{if $line.RightLine}} id="diff-{{Sha1 $file.Index}}R{{$line.RightLine}}" data-line-number="{{$line.RightLine}}"{{end}}>
+														</td>
+														<td class="lines-code halfwidth">
+															<pre><code class="wrap {{if $highlightClass}}language-{{$highlightClass}}{{else}}nohighlight{{end}}">{{if $line.RightLine}}{{$section.ComputedInlineDiffFor $line}}{{end}}</code></pre>
+														</td>
+													{{end}}
+												</tr>
+											{{end}}
+										{{end}}
+									{{else}}
+										{{template "repo/diff/section_unified" .}}
+									{{end}}
+								</tbody>
+							</table>
+						</div>
+					{{end}}
+				</div>
+			</div>
+		{{end}}
+	<br>
+	{{end}}
+
+	{{if .Diff.IsIncomplete}}
+		<div class="cf-diff-file cf-card diff-file-box diff-box file-content">
+			<div class="cf-diff-file__header ui top attached normal header">
+				{{$.i18n.Tr "repo.diff.too_many_files"}}
+			</div>
+		</div>
+	{{end}}
+
+	{{if .IsSplitStyle}}
+		<script>
+			(function() {
+				$('.add-code').each(function() {
+					var prev = $(this).prev();
+					if(prev.is('.del-code') && prev.children().eq(3).text().trim() === '') {
+						while(prev.prev().is('.del-code') && prev.prev().children().eq(3).text().trim() === '') {
+							prev = prev.prev();
+						}
+						prev.children().eq(3).html($(this).children().eq(3).html());
+						prev.children().eq(2).html($(this).children().eq(2).html());
+						prev.children().eq(3).addClass('add-code');
+						prev.children().eq(2).addClass('add-code');
+						$(this).remove();
+					}
+				});
+			}());
+		</script>
+	{{end}}
+{{end}}

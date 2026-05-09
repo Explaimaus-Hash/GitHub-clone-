@@ -1,0 +1,52 @@
+<div class="cf-file-browser">
+	<div class="cf-file-browser__commit">
+		<div class="cf-file-browser__commit-author">
+			{{if .LatestCommitUser}}
+				<img class="cf-file-browser__avatar ui avatar image img-12" src="{{.LatestCommitUser.AvatarURLPath}}" alt="">
+				<a class="cf-file-browser__author-name" href="{{AppSubURL}}/{{.LatestCommitUser.Name}}"><strong>{{.LatestCommit.Author.Name}}</strong></a>
+			{{else}}
+				<img class="cf-file-browser__avatar ui avatar image img-12" src="{{AvatarLink .LatestCommit.Author.Email}}" alt="">
+				<strong class="cf-file-browser__author-name">{{.LatestCommit.Author.Name}}</strong>
+			{{end}}
+			<a rel="nofollow" class="cf-file-browser__sha ui sha label" href="{{.RepoLink}}/commit/{{.LatestCommit.ID}}">{{ShortSHA1 .LatestCommit.ID.String}}</a>
+			<span class="cf-file-browser__commit-message grey has-emoji">{{RenderCommitMessage false .LatestCommit.Summary .RepoLink $.Repository.ComposeMetas | Str2HTML}}</span>
+		</div>
+		<div class="cf-file-browser__commit-age age">{{TimeSince .LatestCommit.Author.When $.Lang}}</div>
+	</div>
+	<table id="repo-files-table" class="cf-file-browser__table ui unstackable fixed single line table">
+		<tbody>
+			{{if .HasParentPath}}
+				<tr class="cf-file-row cf-file-row--parent has-parent">
+					<td colspan="3"><i class="octicon octicon-mail-reply"></i> <a href="{{EscapePound .BranchLink}}{{.ParentPath}}">..</a></td>
+				</tr>
+			{{end}}
+			{{range .Files}}
+				<tr class="cf-file-row">
+					{{if .Submodule}}
+						<td class="cf-file-row__name">
+							<i class="octicon octicon-file-submodule"></i>
+							<a href="{{InferSubmoduleURL $.RepoLink .Submodule}}">{{.Entry.Name}} {{if .Submodule.Commit}}@ {{ShortSHA1 .Submodule.Commit}}{{end}}</a>
+						</td>
+					{{else}}
+						<td class="cf-file-row__name name">
+							{{if .Entry.IsSymlink}}
+								<i class="octicon octicon-file-symlink-file"></i>
+							{{else}}
+								<i class="octicon octicon-file-{{if or .Entry.IsTree}}directory{{else}}text{{end}}"></i>
+							{{end}}
+							<a href="{{EscapePound $.TreeLink}}/{{EscapePound .Entry.Name}}">{{.Entry.Name}}</a>
+						</td>
+					{{end}}
+					<td class="cf-file-row__message message collapsing has-emoji">
+						<a rel="nofollow" class="cf-file-row__sha ui sha label" href="{{$.RepoLink}}/commit/{{.Commit.ID}}">{{ShortSHA1 .Commit.ID.String}}</a>
+						{{RenderCommitMessage false .Commit.Summary $.RepoLink $.Repository.ComposeMetas | Str2HTML}}
+					</td>
+					<td class="cf-file-row__age grey right age">{{TimeSince .Commit.Committer.When $.Lang}}</td>
+				</tr>
+			{{end}}
+		</tbody>
+	</table>
+</div>
+{{if and .ReadmeExist .IsTextFile}}
+	{{template "repo/view_file" .}}
+{{end}}

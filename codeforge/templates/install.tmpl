@@ -1,0 +1,283 @@
+{{template "base/head" .}}
+<main class="cf-install">
+	<div class="cf-install__inner">
+		<header class="cf-install__header">
+			<a class="cf-auth-page__brand" href="{{AppSubURL}}/">
+				<img src="{{AppSubURL}}/img/codeforge-mark.svg" alt="" width="32" height="32"> <span>{{AppName}}</span>
+			</a>
+			<h1>{{.i18n.Tr "install.title"}}</h1>
+			<p class="cf-mute">{{.i18n.Tr "install.docker_helper" "https://github.com/gogs/gogs/tree/main/docker" | Safe}}</p>
+		</header>
+
+		<div class="cf-card">
+			<div class="cf-card__body">
+				{{template "base/alert" .}}
+
+				<form class="ui form cf-install__form" action="{{AppSubURL}}/install" method="post">
+					<!-- Database -->
+					<section class="cf-install__section">
+						<h3>{{.i18n.Tr "install.db_title"}}</h3>
+						<p class="cf-mute">{{.i18n.Tr "install.requite_db_desc"}}</p>
+
+						<div class="cf-field {{if .Err_DbType}}is-error{{end}}">
+							<label class="cf-field__label">{{.i18n.Tr "install.db_type"}}</label>
+							<div class="ui selection database type dropdown">
+								<input type="hidden" id="db_type" name="db_type" value="{{.CurDbOption}}">
+								<div class="text">{{.CurDbOption}}</div>
+								<i class="dropdown icon"></i>
+								<div class="menu">
+									{{range .DbOptions}}<div class="item" data-value="{{.}}">{{.}}</div>{{end}}
+								</div>
+							</div>
+						</div>
+
+						<div id="sql_settings" class="cf-grid cf-grid--cols-2 {{if eq .CurDbOption "SQLite3"}}cf-hidden{{end}}">
+							<div class="cf-field {{if .Err_DbSetting}}is-error{{end}}">
+								<label class="cf-field__label" for="db_host">{{.i18n.Tr "install.host"}}</label>
+								<input id="db_host" class="cf-input" name="db_host" value="{{.db_host}}">
+							</div>
+							<div class="cf-field {{if .Err_DbSetting}}is-error{{end}}">
+								<label class="cf-field__label" for="db_user">{{.i18n.Tr "install.user"}}</label>
+								<input id="db_user" class="cf-input" name="db_user" value="{{.db_user}}">
+							</div>
+							<div class="cf-field {{if .Err_DbSetting}}is-error{{end}}">
+								<label class="cf-field__label" for="db_passwd">{{.i18n.Tr "install.password"}}</label>
+								<input id="db_passwd" class="cf-input" name="db_passwd" type="password" value="{{.db_passwd}}">
+							</div>
+							<div class="cf-field {{if .Err_DbSetting}}is-error{{end}}">
+								<label class="cf-field__label" for="db_name">{{.i18n.Tr "install.db_name"}}</label>
+								<input id="db_name" class="cf-input" name="db_name" value="{{.db_name}}">
+								<span class="cf-field__hint">{{.i18n.Tr "install.db_helper"}}</span>
+							</div>
+						</div>
+
+						<div id="pgsql_settings" class="cf-grid cf-grid--cols-2 {{if not (eq .CurDbOption "PostgreSQL")}}cf-hidden{{end}}">
+							<div class="cf-field">
+								<label class="cf-field__label" for="db_schema">{{.i18n.Tr "install.db_schema"}}</label>
+								<input id="db_schema" class="cf-input" name="db_schema" value="{{.db_schema}}">
+							</div>
+							<div class="cf-field">
+								<label class="cf-field__label">{{.i18n.Tr "install.ssl_mode"}}</label>
+								<div class="ui selection database type dropdown">
+									<input type="hidden" name="ssl_mode" value="{{if .ssl_mode}}{{.ssl_mode}}{{else}}disable{{end}}">
+									<div class="default text">disable</div>
+									<i class="dropdown icon"></i>
+									<div class="menu">
+										<div class="item" data-value="disable">Disable</div>
+										<div class="item" data-value="require">Require</div>
+										<div class="item" data-value="verify-full">Verify Full</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div id="sqlite_settings" class="{{if not (eq .CurDbOption "SQLite3")}}cf-hidden{{end}}">
+							<div class="cf-field {{if or .Err_DbPath .Err_DbSetting}}is-error{{end}}">
+								<label class="cf-field__label" for="db_path">{{.i18n.Tr "install.path"}}</label>
+								<input id="db_path" class="cf-input" name="db_path" value="{{.db_path}}">
+								<span class="cf-field__hint">{{.i18n.Tr "install.sqlite_helper" | Safe}}</span>
+							</div>
+						</div>
+					</section>
+
+					<!-- General -->
+					<section class="cf-install__section">
+						<h3>{{.i18n.Tr "install.general_title"}}</h3>
+						<div class="cf-grid cf-grid--cols-2">
+							<div class="cf-field {{if .Err_AppName}}is-error{{end}}">
+								<label class="cf-field__label" for="app_name">{{.i18n.Tr "install.app_name"}}</label>
+								<input id="app_name" class="cf-input" name="app_name" value="{{.app_name}}" required>
+								<span class="cf-field__hint">{{.i18n.Tr "install.app_name_helper"}}</span>
+							</div>
+							<div class="cf-field {{if .Err_RepoRootPath}}is-error{{end}}">
+								<label class="cf-field__label" for="repo_root_path">{{.i18n.Tr "install.repo_path"}}</label>
+								<input id="repo_root_path" class="cf-input" name="repo_root_path" value="{{.repo_root_path}}" required>
+								<span class="cf-field__hint">{{.i18n.Tr "install.repo_path_helper"}}</span>
+							</div>
+							<div class="cf-field {{if .Err_RunUser}}is-error{{end}}">
+								<label class="cf-field__label" for="run_user">{{.i18n.Tr "install.run_user"}}</label>
+								<input id="run_user" class="cf-input" name="run_user" value="{{.run_user}}" required>
+								<span class="cf-field__hint">{{.i18n.Tr "install.run_user_helper"}}</span>
+							</div>
+							<div class="cf-field">
+								<label class="cf-field__label" for="domain">{{.i18n.Tr "install.domain"}}</label>
+								<input id="domain" class="cf-input" name="domain" value="{{.domain}}" placeholder="e.g. forge.example.com" required>
+								<span class="cf-field__hint">{{.i18n.Tr "install.domain_helper"}}</span>
+							</div>
+							<div class="cf-field">
+								<label class="cf-field__label" for="ssh_port">{{.i18n.Tr "install.ssh_port"}}</label>
+								<input id="ssh_port" class="cf-input" name="ssh_port" value="{{.ssh_port}}">
+								<span class="cf-field__hint">{{.i18n.Tr "install.ssh_port_helper"}}</span>
+							</div>
+							<div class="cf-field">
+								<label class="cf-field__label" for="http_port">{{.i18n.Tr "install.http_port"}}</label>
+								<input id="http_port" class="cf-input" name="http_port" value="{{.http_port}}" required>
+								<span class="cf-field__hint">{{.i18n.Tr "install.http_port_helper"}}</span>
+							</div>
+							<div class="cf-field">
+								<label class="cf-field__label" for="app_url">{{.i18n.Tr "install.app_url"}}</label>
+								<input id="app_url" class="cf-input" name="app_url" value="{{.app_url}}" placeholder="e.g. https://forge.example.com" required>
+								<span class="cf-field__hint">{{.i18n.Tr "install.app_url_helper"}}</span>
+							</div>
+							<div class="cf-field">
+								<label class="cf-field__label" for="log_root_path">{{.i18n.Tr "install.log_root_path"}}</label>
+								<input id="log_root_path" class="cf-input" name="log_root_path" value="{{.log_root_path}}" placeholder="log" required>
+								<span class="cf-field__hint">{{.i18n.Tr "install.log_root_path_helper"}}</span>
+							</div>
+							<div class="cf-field">
+								<label class="cf-field__label" for="default_branch">{{.i18n.Tr "install.default_branch"}}</label>
+								<input id="default_branch" class="cf-input" name="default_branch" value="{{.default_branch}}" required>
+							</div>
+						</div>
+
+						<div class="cf-flex cf-flex-col cf-gap-2 cf-mt-4">
+							<div class="ui checkbox">
+								<input name="use_builtin_ssh_server" type="checkbox" {{if .use_builtin_ssh_server}}checked{{end}}>
+								<label class="poping up" data-content="{{.i18n.Tr "install.use_builtin_ssh_server_popup"}}"><strong>{{.i18n.Tr "install.use_builtin_ssh_server"}}</strong></label>
+							</div>
+							<div class="ui checkbox">
+								<input name="enable_console_mode" type="checkbox" {{if .enable_console_mode}}checked{{end}}>
+								<label class="poping up" data-content="{{.i18n.Tr "install.enable_console_mode_popup"}}"><strong>{{.i18n.Tr "install.enable_console_mode"}}</strong></label>
+							</div>
+						</div>
+					</section>
+
+					<!-- Optional: Email -->
+					<section class="cf-install__section">
+						<details class="cf-details" {{if .Err_SMTP}}open{{end}}>
+							<summary><h3 class="cf-details__title">{{.i18n.Tr "install.email_title"}}</h3></summary>
+							<div class="cf-grid cf-grid--cols-2 cf-mt-4">
+								<div class="cf-field {{if .Err_SMTPHost}}is-error{{end}}">
+									<label class="cf-field__label" for="smtp_host">{{.i18n.Tr "install.smtp_host"}}</label>
+									<input id="smtp_host" class="cf-input" name="smtp_host" value="{{.smtp_host}}">
+								</div>
+								<div class="cf-field {{if .Err_SMTPFrom}}is-error{{end}}">
+									<label class="cf-field__label" for="smtp_from">{{.i18n.Tr "install.smtp_from"}}</label>
+									<input id="smtp_from" class="cf-input" name="smtp_from" value="{{.smtp_from}}">
+									<span class="cf-field__hint">{{.i18n.Tr "install.smtp_from_helper"}}</span>
+								</div>
+								<div class="cf-field {{if .Err_SMTPUser}}is-error{{end}}">
+									<label class="cf-field__label" for="smtp_user">{{.i18n.Tr "install.mailer_user"}}</label>
+									<input id="smtp_user" class="cf-input" name="smtp_user" value="{{.smtp_user}}">
+								</div>
+								<div class="cf-field">
+									<label class="cf-field__label" for="smtp_passwd">{{.i18n.Tr "install.mailer_password"}}</label>
+									<input id="smtp_passwd" class="cf-input" name="smtp_passwd" type="password" value="{{.smtp_passwd}}">
+								</div>
+							</div>
+							<div class="cf-flex cf-flex-col cf-gap-2 cf-mt-4">
+								<div class="ui checkbox">
+									<input name="register_confirm" type="checkbox" {{if .register_confirm}}checked{{end}}>
+									<label><strong>{{.i18n.Tr "install.register_confirm"}}</strong></label>
+								</div>
+								<div class="ui checkbox">
+									<input name="mail_notify" type="checkbox" {{if .mail_notify}}checked{{end}}>
+									<label><strong>{{.i18n.Tr "install.mail_notify"}}</strong></label>
+								</div>
+							</div>
+						</details>
+					</section>
+
+					<!-- Optional: Server services -->
+					<section class="cf-install__section">
+						<details class="cf-details" {{if .Err_Services}}open{{end}}>
+							<summary><h3 class="cf-details__title">{{.i18n.Tr "install.server_service_title"}}</h3></summary>
+							<div class="cf-flex cf-flex-col cf-gap-2 cf-mt-4">
+								<div class="ui checkbox" id="offline-mode">
+									<input name="offline_mode" type="checkbox" {{if .offline_mode}}checked{{end}}>
+									<label class="poping up" data-content="{{.i18n.Tr "install.offline_mode_popup"}}"><strong>{{.i18n.Tr "install.offline_mode"}}</strong></label>
+								</div>
+								<div class="ui checkbox" id="disable-gravatar">
+									<input name="disable_gravatar" type="checkbox" {{if .disable_gravatar}}checked{{end}}>
+									<label class="poping up" data-content="{{.i18n.Tr "install.disable_gravatar_popup"}}"><strong>{{.i18n.Tr "install.disable_gravatar"}}</strong></label>
+								</div>
+								<div class="ui checkbox" id="federated-avatar-lookup">
+									<input name="enable_federated_avatar" type="checkbox" {{if .enable_federated_avatar}}checked{{end}}>
+									<label class="poping up" data-content="{{.i18n.Tr "install.federated_avatar_lookup_popup"}}"><strong>{{.i18n.Tr "install.federated_avatar_lookup"}}</strong></label>
+								</div>
+								<div class="ui checkbox" id="disable-registration">
+									<input name="disable_registration" type="checkbox" {{if .disable_registration}}checked{{end}}>
+									<label class="poping up" data-content="{{.i18n.Tr "install.disable_registration_popup"}}"><strong>{{.i18n.Tr "install.disable_registration"}}</strong></label>
+								</div>
+								<div class="ui checkbox" id="enable-captcha">
+									<input name="enable_captcha" type="checkbox" {{if .enable_captcha}}checked{{end}}>
+									<label class="poping up" data-content="{{.i18n.Tr "install.enable_captcha_popup"}}"><strong>{{.i18n.Tr "install.enable_captcha"}}</strong></label>
+								</div>
+								<div class="ui checkbox">
+									<input name="require_sign_in_view" type="checkbox" {{if .require_sign_in_view}}checked{{end}}>
+									<label class="poping up" data-content="{{.i18n.Tr "install.require_sign_in_view_popup"}}"><strong>{{.i18n.Tr "install.require_sign_in_view"}}</strong></label>
+								</div>
+							</div>
+						</details>
+					</section>
+
+					<!-- Optional: Admin -->
+					<section class="cf-install__section">
+						<details class="cf-details" {{if .Err_Admin}}open{{end}}>
+							<summary><h3 class="cf-details__title">{{.i18n.Tr "install.admin_title"}}</h3></summary>
+							<p class="cf-mute cf-mt-2">{{.i18n.Tr "install.admin_setting_desc"}}</p>
+							<div class="cf-grid cf-grid--cols-2 cf-mt-4">
+								<div class="cf-field {{if .Err_AdminName}}is-error{{end}}">
+									<label class="cf-field__label" for="admin_name">{{.i18n.Tr "install.admin_name"}}</label>
+									<input id="admin_name" class="cf-input" name="admin_name" value="{{.admin_name}}" autocomplete="username">
+								</div>
+								<div class="cf-field {{if .Err_AdminEmail}}is-error{{end}}">
+									<label class="cf-field__label" for="admin_email">{{.i18n.Tr "install.admin_email"}}</label>
+									<input id="admin_email" class="cf-input" name="admin_email" type="email" value="{{.admin_email}}" autocomplete="email">
+								</div>
+								<div class="cf-field {{if .Err_AdminPasswd}}is-error{{end}}">
+									<label class="cf-field__label" for="admin_passwd">{{.i18n.Tr "install.admin_password"}}</label>
+									<input id="admin_passwd" class="cf-input" name="admin_passwd" type="password" value="{{.admin_passwd}}" autocomplete="new-password">
+								</div>
+								<div class="cf-field {{if .Err_AdminPasswd}}is-error{{end}}">
+									<label class="cf-field__label" for="admin_confirm_passwd">{{.i18n.Tr "install.confirm_password"}}</label>
+									<input id="admin_confirm_passwd" class="cf-input" name="admin_confirm_passwd" type="password" value="{{.admin_confirm_passwd}}" autocomplete="new-password">
+								</div>
+							</div>
+						</details>
+					</section>
+
+					<div class="cf-flex cf-justify-between cf-items-center cf-mt-6">
+						<span class="cf-subtle">All values are stored in <code>app.ini</code> and can be edited later.</span>
+						<button class="cf-btn cf-btn--primary cf-btn--lg" type="submit">{{.i18n.Tr "install.install_gogs"}}</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</main>
+
+<script>
+	$("#db_type").change(function () {
+		var sqliteDefault = 'data/gogs.db';
+		var dbType = $(this).val();
+		if (dbType === "SQLite3") {
+			$('#sql_settings').addClass('cf-hidden');
+			$('#pgsql_settings').addClass('cf-hidden');
+			$('#sqlite_settings').removeClass('cf-hidden');
+			$('#db_path').val(sqliteDefault);
+			return;
+		}
+		var dbDefaults = { "MySQL": "127.0.0.1:3306", "PostgreSQL": "127.0.0.1:5432" };
+		$('#sqlite_settings').addClass('cf-hidden');
+		$('#sql_settings').removeClass('cf-hidden');
+		if (dbType === "PostgreSQL") $('#pgsql_settings').removeClass('cf-hidden');
+		else $('#pgsql_settings').addClass('cf-hidden');
+		$.each(dbDefaults, function(type, defaultHost) {
+			if ($('#db_host').val() == defaultHost) { $('#db_host').val(dbDefaults[dbType]); return false; }
+		});
+	});
+	$('#offline-mode input').change(function () {
+		if ($(this).is(':checked')) { $('#disable-gravatar').checkbox('check'); $('#federated-avatar-lookup').checkbox('uncheck'); }
+	});
+	$('#disable-gravatar input').change(function () {
+		if ($(this).is(':checked')) $('#federated-avatar-lookup').checkbox('uncheck');
+		else $('#offline-mode').checkbox('uncheck');
+	});
+	$('#federated-avatar-lookup input').change(function () {
+		if ($(this).is(':checked')) { $('#disable-gravatar').checkbox('uncheck'); $('#offline-mode').checkbox('uncheck'); }
+	});
+	$('#disable-registration input').change(function () { if ($(this).is(':checked')) $('#enable-captcha').checkbox('uncheck'); });
+	$('#enable-captcha input').change(function () { if ($(this).is(':checked')) $('#disable-registration').checkbox('uncheck'); });
+</script>
+{{template "base/footer" .}}

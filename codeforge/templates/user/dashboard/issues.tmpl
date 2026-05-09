@@ -1,0 +1,140 @@
+{{template "base/head" .}}
+<main class="cf-dashboard dashboard issues">
+	{{template "user/dashboard/navbar" .}}
+
+	<div class="cf-dashboard__inner ui container">
+		<header class="cf-page-header">
+			<div class="cf-page-header__title">
+				<h1>{{if .PageIsPulls}}{{.i18n.Tr "pull_requests"}}{{else}}{{.i18n.Tr "issues"}}{{end}}</h1>
+				<span class="cf-subtitle">Across repositories you can access.</span>
+			</div>
+		</header>
+
+		<div class="cf-dashboard__grid cf-dashboard__grid--issues">
+			<aside class="cf-issue-sidebar">
+				<nav class="cf-issue-sidebar__nav">
+					<a class="cf-issue-sidebar__item {{if eq .ViewType "your_repositories"}}is-active{{end}}" href="{{.Link}}?type=your_repositories&repo={{.RepoID}}&sort={{$.SortType}}&state={{.State}}">
+						<span>{{.i18n.Tr "home.issues.in_your_repos"}}</span>
+						<span class="cf-badge">{{.IssueStats.YourReposCount}}</span>
+					</a>
+					{{if not .ContextUser.IsOrganization}}
+						<a class="cf-issue-sidebar__item {{if eq .ViewType "assigned"}}is-active{{end}}" href="{{.Link}}?type=assigned&repo={{.RepoID}}&sort={{$.SortType}}&state={{.State}}">
+							<span>{{.i18n.Tr "repo.issues.filter_type.assigned_to_you"}}</span>
+							<span class="cf-badge">{{.IssueStats.AssignCount}}</span>
+						</a>
+						<a class="cf-issue-sidebar__item {{if eq .ViewType "created_by"}}is-active{{end}}" href="{{.Link}}?type=created_by&repo={{.RepoID}}&sort={{$.SortType}}&state={{.State}}">
+							<span>{{.i18n.Tr "repo.issues.filter_type.created_by_you"}}</span>
+							<span class="cf-badge">{{.IssueStats.CreateCount}}</span>
+						</a>
+					{{end}}
+				</nav>
+
+				{{if .Repos}}
+					<div class="cf-issue-sidebar__divider"></div>
+					<div class="cf-issue-sidebar__heading">{{.i18n.Tr "repository"}}</div>
+					<nav class="cf-issue-sidebar__nav">
+						{{range .Repos}}
+							<a class="cf-issue-sidebar__item {{if eq $.RepoID .ID}}is-active{{end}}" href="{{$.Link}}?type={{$.ViewType}}{{if not (eq $.RepoID .ID)}}&repo={{.ID}}{{end}}&sort={{$.SortType}}&state={{$.State}}">
+								<span class="cf-issue-sidebar__repo">{{.FullName}}</span>
+								<span class="cf-badge {{if $.IsShowClosed}}cf-badge--danger{{else}}cf-badge--success{{end}}">
+								{{if $.PageIsIssues}}
+									{{if $.IsShowClosed}}{{.NumClosedIssues}}{{else}}{{.NumOpenIssues}}{{end}}
+								{{else}}
+									{{if $.IsShowClosed}}{{.NumClosedPulls}}{{else}}{{.NumOpenPulls}}{{end}}
+								{{end}}
+								</span>
+							</a>
+						{{end}}
+					</nav>
+				{{end}}
+			</aside>
+
+			<section class="cf-issue-list-wrap">
+				<div class="cf-issue-toolbar">
+					<div class="cf-tabs">
+						<a class="cf-tabs__item {{if not .IsShowClosed}}is-active{{end}}" href="{{.Link}}?type={{$.ViewType}}&repo={{.RepoID}}&sort={{$.SortType}}&state=open">
+							<i class="octicon octicon-issue-opened"></i> {{.i18n.Tr "repo.issues.open_tab" .IssueStats.OpenCount}}
+						</a>
+						<a class="cf-tabs__item {{if .IsShowClosed}}is-active{{end}}" href="{{.Link}}?type={{$.ViewType}}&repo={{.RepoID}}&sort={{$.SortType}}&state=closed">
+							<i class="octicon octicon-issue-closed"></i> {{.i18n.Tr "repo.issues.close_tab" .IssueStats.ClosedCount}}
+						</a>
+					</div>
+
+					<div class="ui dropdown type jump item cf-issue-toolbar__sort">
+						<span class="text">{{.i18n.Tr "repo.issues.filter_sort"}} <i class="dropdown icon"></i></span>
+						<div class="menu">
+							<a class="{{if or (eq .SortType "latest") (not .SortType)}}active{{end}} item" href="{{$.Link}}?type={{$.ViewType}}&repo={{.RepoID}}&sort=latest&state={{$.State}}">{{.i18n.Tr "repo.issues.filter_sort.latest"}}</a>
+							<a class="{{if eq .SortType "oldest"}}active{{end}} item" href="{{$.Link}}?type={{$.ViewType}}&repo={{.RepoID}}&sort=oldest&state={{$.State}}">{{.i18n.Tr "repo.issues.filter_sort.oldest"}}</a>
+							<a class="{{if eq .SortType "recentupdate"}}active{{end}} item" href="{{$.Link}}?type={{$.ViewType}}&repo={{.RepoID}}&sort=recentupdate&state={{$.State}}">{{.i18n.Tr "repo.issues.filter_sort.recentupdate"}}</a>
+							<a class="{{if eq .SortType "leastupdate"}}active{{end}} item" href="{{$.Link}}?type={{$.ViewType}}&repo={{.RepoID}}&sort=leastupdate&state={{$.State}}">{{.i18n.Tr "repo.issues.filter_sort.leastupdate"}}</a>
+							<a class="{{if eq .SortType "mostcomment"}}active{{end}} item" href="{{$.Link}}?type={{$.ViewType}}&repo={{.RepoID}}&sort=mostcomment&state={{$.State}}">{{.i18n.Tr "repo.issues.filter_sort.mostcomment"}}</a>
+							<a class="{{if eq .SortType "leastcomment"}}active{{end}} item" href="{{$.Link}}?type={{$.ViewType}}&repo={{.RepoID}}&sort=leastcomment&state={{$.State}}">{{.i18n.Tr "repo.issues.filter_sort.leastcomment"}}</a>
+						</div>
+					</div>
+				</div>
+
+				<ul class="cf-issue-list issue list">
+					{{range .Issues}}
+						{{ $timeStr := TimeSince .Created $.Lang }}
+						<li class="cf-issue item">
+							<div class="cf-issue__icon">
+								<i class="octicon octicon-{{if .IsClosed}}issue-closed{{else}}issue-opened{{end}}"></i>
+							</div>
+							<div class="cf-issue__body">
+								<div class="cf-issue__head">
+									{{if not $.RepoID}}<span class="cf-badge cf-badge--mono">{{.Repo.FullName}}#{{.Index}}</span>{{else}}<span class="cf-badge cf-badge--mono">#{{.Index}}</span>{{end}}
+									<a class="cf-issue__title title has-emoji" href="{{AppSubURL}}/{{.Repo.Owner.Name}}/{{.Repo.Name}}/issues/{{.Index}}">{{.Title}}</a>
+								</div>
+								<div class="cf-issue__meta">
+									{{$.i18n.Tr "repo.issues.opened_by" $timeStr .Poster.HomeURLPath .Poster.Name | Safe}}
+								</div>
+								{{if .Labels}}
+									<div class="cf-issue__labels">
+										{{range .Labels}}
+											<a class="cf-chip" style="color: {{.ForegroundColor}}; background-color: {{.Color}}; border-color: transparent;">{{.Name | Sanitize}}</a>
+										{{end}}
+									</div>
+								{{end}}
+							</div>
+							<div class="cf-issue__side">
+								{{if .Assignee}}
+									<a class="cf-issue__assignee poping up" href="{{.Assignee.HomeURLPath}}" data-content="{{.Assignee.Name}}" data-variation="inverted" data-position="left center">
+										<img class="cf-avatar cf-avatar--sm" src="{{.Assignee.AvatarURLPath}}" alt="">
+									</a>
+								{{end}}
+								{{if .NumComments}}
+									<span class="cf-issue__comments"><i class="octicon octicon-comment"></i> {{.NumComments}}</span>
+								{{end}}
+							</div>
+						</li>
+					{{else}}
+						<li class="cf-empty">
+							<div class="cf-empty__icon">
+								<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+							</div>
+							<div class="cf-empty__title">No issues found</div>
+							<p class="cf-mute">Nothing matches the current filter.</p>
+						</li>
+					{{end}}
+				</ul>
+
+				{{with .Page}}
+					{{if gt .TotalPages 1}}
+						<div class="cf-pagination cf-mt-6" style="justify-content:center;">
+							<a class="cf-pagination__item {{if not .HasPrevious}}is-disabled{{end}}" {{if .HasPrevious}}href="{{$.Link}}?type={{$.ViewType}}&sort={{$.SortType}}&state={{$.State}}&labels={{$.SelectLabels}}&milestone={{$.MilestoneID}}&assignee={{$.AssigneeID}}&page={{.Previous}}"{{end}}>&larr; {{$.i18n.Tr "repo.issues.previous"}}</a>
+							{{range .Pages}}
+								{{if eq .Num -1}}
+									<span class="cf-pagination__item is-disabled">&hellip;</span>
+								{{else}}
+									<a class="cf-pagination__item {{if .IsCurrent}}is-active{{end}}" {{if not .IsCurrent}}href="{{$.Link}}?type={{$.ViewType}}&sort={{$.SortType}}&state={{$.State}}&labels={{$.SelectLabels}}&milestone={{$.MilestoneID}}&assignee={{$.AssigneeID}}&page={{.Num}}"{{end}}>{{.Num}}</a>
+								{{end}}
+							{{end}}
+							<a class="cf-pagination__item {{if not .HasNext}}is-disabled{{end}}" {{if .HasNext}}href="{{$.Link}}?type={{$.ViewType}}&sort={{$.SortType}}&state={{$.State}}&labels={{$.SelectLabels}}&milestone={{$.MilestoneID}}&assignee={{$.AssigneeID}}&page={{.Next}}"{{end}}>{{$.i18n.Tr "repo.issues.next"}} &rarr;</a>
+						</div>
+					{{end}}
+				{{end}}
+			</section>
+		</div>
+	</div>
+</main>
+{{template "base/footer" .}}

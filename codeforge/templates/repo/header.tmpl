@@ -1,0 +1,95 @@
+<div class="cf-repo-header header-wrapper">
+{{with .Repository}}
+	<div class="cf-repo-header__top ui container">
+		<div class="cf-repo-header__title">
+			<div class="cf-repo-header__icon">
+				{{if .UseCustomAvatar}}
+					<img src="{{.RelAvatarLink}}" alt="">
+				{{else}}
+					<i class="octicon octicon-{{if .IsPrivate}}lock{{else if .IsUnlisted}}eye{{else if .IsMirror}}repo-clone{{else if .IsFork}}repo-forked{{else}}repo{{end}}"></i>
+				{{end}}
+			</div>
+			<div class="cf-repo-header__breadcrumb ui huge breadcrumb">
+				<a class="cf-repo-header__owner" href="{{AppSubURL}}/{{.Owner.Name}}">{{.Owner.Name}}</a>
+				<span class="cf-repo-header__sep divider">/</span>
+				<a class="cf-repo-header__name" href="{{$.RepoLink}}">{{.Name}}</a>
+				{{if .IsPrivate}}<span class="cf-chip cf-chip--warn">{{$.i18n.Tr "repo.private"}}</span>{{end}}
+				{{if .IsUnlisted}}<span class="cf-chip">{{$.i18n.Tr "repo.unlisted"}}</span>{{end}}
+				{{if .IsMirror}}<span class="cf-chip cf-chip--info">{{$.i18n.Tr "repo.mirror"}}</span>{{end}}
+				{{if .IsFork}}<span class="cf-chip">{{$.i18n.Tr "repo.fork"}}</span>{{end}}
+			</div>
+			{{if .IsMirror}}<div class="cf-repo-header__flag fork-flag">{{$.i18n.Tr "repo.mirror_from"}} <a target="_blank" rel="noopener noreferrer" href="{{$.Mirror.Address}}">{{$.Mirror.Address}}</a></div>{{end}}
+			{{if .IsFork}}<div class="cf-repo-header__flag fork-flag">{{$.i18n.Tr "repo.forked_from"}} <a href="{{.BaseRepo.Link}}">{{SubStr .BaseRepo.RelLink 1 -1}}</a></div>{{end}}
+		</div>
+
+		{{if not $.IsGuest}}
+			<div class="cf-repo-header__actions">
+				<form class="cf-repo-action display inline" action="{{$.RepoLink}}/action/{{if $.IsWatchingRepo}}un{{end}}watch?redirect_to={{$.Link}}" method="POST">
+					{{$.CSRFTokenHTML}}
+					<div class="cf-repo-action__group ui labeled button" tabindex="0">
+						<button class="cf-btn cf-btn--ghost ui basic button">
+							<i class="octicon octicon-eye"></i>
+							<span>{{if $.IsWatchingRepo}}{{$.i18n.Tr "repo.unwatch"}}{{else}}{{$.i18n.Tr "repo.watch"}}{{end}}</span>
+						</button>
+						<a class="cf-repo-action__count ui basic label" href="{{.Link}}/watchers">{{.NumWatches}}</a>
+					</div>
+				</form>
+				<form class="cf-repo-action display inline" action="{{$.RepoLink}}/action/{{if $.IsStaringRepo}}un{{end}}star?redirect_to={{$.Link}}" method="POST">
+					{{$.CSRFTokenHTML}}
+					<div class="cf-repo-action__group ui labeled button" tabindex="0">
+						<button class="cf-btn cf-btn--ghost ui basic button">
+							<i class="octicon octicon-star"></i>
+							<span>{{if $.IsStaringRepo}}{{$.i18n.Tr "repo.unstar"}}{{else}}{{$.i18n.Tr "repo.star"}}{{end}}</span>
+						</button>
+						<a class="cf-repo-action__count ui basic label" href="{{.Link}}/stars">{{.NumStars}}</a>
+					</div>
+				</form>
+				{{if .CanBeForked}}
+					<div class="cf-repo-action__group ui labeled button" tabindex="0">
+						<a class="cf-btn cf-btn--ghost ui basic button" href="{{AppSubURL}}/repo/fork/{{.ID}}">
+							<i class="octicon octicon-repo-forked"></i>
+							<span>{{$.i18n.Tr "repo.fork"}}</span>
+						</a>
+						<a class="cf-repo-action__count ui basic label" href="{{.Link}}/forks">{{.NumForks}}</a>
+					</div>
+				{{end}}
+			</div>
+		{{end}}
+	</div>
+{{end}}
+{{if not .IsDiffCompare}}
+	<div class="cf-repo-tabs ui tabs container">
+		<div class="cf-repo-tabs__list ui tabular menu navbar">
+			{{if not $.IsGuest}}
+				<a class="cf-repo-tabs__tab item {{if .PageIsViewFiles}}is-active active{{end}}" href="{{.RepoLink}}">
+					<i class="octicon octicon-file-text"></i> <span>{{.i18n.Tr "repo.files"}}</span>
+				</a>
+			{{end}}
+			{{if .Repository.EnableIssues}}
+				<a class="cf-repo-tabs__tab item {{if .PageIsIssueList}}is-active active{{end}}" href="{{.RepoLink}}/issues">
+					<i class="octicon octicon-issue-opened"></i> <span>{{.i18n.Tr "repo.issues"}}</span>
+					{{if not .Repository.EnableExternalTracker}}<span class="cf-tab-count ui {{if not .Repository.NumOpenIssues}}gray{{else}}blue{{end}} small label">{{.Repository.NumOpenIssues}}</span>{{end}}
+				</a>
+			{{end}}
+			{{if and .Repository.AllowsPulls (not .IsGuest)}}
+				<a class="cf-repo-tabs__tab item {{if .PageIsPullList}}is-active active{{end}}" href="{{.RepoLink}}/pulls">
+					<i class="octicon octicon-git-pull-request"></i> <span>{{.i18n.Tr "repo.pulls"}}</span>
+					<span class="cf-tab-count ui {{if not .Repository.NumOpenPulls}}gray{{else}}blue{{end}} small label">{{.Repository.NumOpenPulls}}</span>
+				</a>
+			{{end}}
+			{{if .Repository.EnableWiki}}
+				<a class="cf-repo-tabs__tab item {{if .PageIsWiki}}is-active active{{end}}" href="{{.RepoLink}}/wiki">
+					<i class="octicon octicon-book"></i> <span>{{.i18n.Tr "repo.wiki"}}</span>
+				</a>
+			{{end}}
+			{{if .IsRepositoryAdmin}}
+				<div class="cf-repo-tabs__right right menu">
+					<a class="cf-repo-tabs__tab item {{if .PageIsSettings}}is-active active{{end}}" href="{{.RepoLink}}/settings">
+						<i class="octicon octicon-tools"></i> <span>{{.i18n.Tr "repo.settings"}}</span>
+					</a>
+				</div>
+			{{end}}
+		</div>
+	</div>
+{{end}}
+</div>

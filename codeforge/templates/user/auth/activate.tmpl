@@ -1,0 +1,36 @@
+{{template "base/head" .}}
+<main class="cf-auth-page user activate">
+	<div class="cf-auth-page__inner cf-auth-page__inner--narrow">
+		<section class="cf-auth-card">
+			<header class="cf-auth-card__header">
+				<a class="cf-auth-page__brand" href="{{AppSubURL}}/">
+					<img src="{{AppSubURL}}/img/codeforge-mark.svg" alt="" width="28" height="28"> <span>{{AppName}}</span>
+				</a>
+				<h1>{{.i18n.Tr "auth.active_your_account"}}</h1>
+			</header>
+			<form class="ui form cf-auth-card__body" action="{{AppSubURL}}/user/activate" method="post">
+				{{.CSRFTokenHTML}}
+				{{template "base/alert" .}}
+				{{if .IsActivatePage}}
+					{{if .ServiceNotEnabled}}
+						<div class="ui warning message"><p>{{.i18n.Tr "auth.disable_register_mail"}}</p></div>
+					{{else if .ResendLimited}}
+						<div class="ui warning message"><p>{{.i18n.Tr "auth.resent_limit_prompt"}}</p></div>
+					{{else}}
+						<div class="ui info message"><p>{{.i18n.Tr "auth.confirmation_mail_sent_prompt" .LoggedUser.Email .Hours | Str2HTML}}</p></div>
+					{{end}}
+				{{else}}
+					{{if .IsSendRegisterMail}}
+						<div class="ui info message"><p>{{.i18n.Tr "auth.confirmation_mail_sent_prompt" .Email .Hours | Str2HTML}}</p></div>
+					{{else if .IsActivateFailed}}
+						<div class="ui negative message"><p>{{.i18n.Tr "auth.invalid_code"}}</p></div>
+					{{else}}
+						<p class="cf-mute">{{.i18n.Tr "auth.has_unconfirmed_mail" .LoggedUser.Name .LoggedUser.Email | Str2HTML}}</p>
+						<button class="cf-btn cf-btn--primary cf-btn--block cf-mt-4" type="submit">{{.i18n.Tr "auth.resend_mail"}}</button>
+					{{end}}
+				{{end}}
+			</form>
+		</section>
+	</div>
+</main>
+{{template "base/footer" .}}

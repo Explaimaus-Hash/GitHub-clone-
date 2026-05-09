@@ -1,0 +1,34 @@
+{{template "base/head" .}}
+<main class="cf-auth-page user forgot password">
+	<div class="cf-auth-page__inner cf-auth-page__inner--narrow">
+		<section class="cf-auth-card">
+			<header class="cf-auth-card__header">
+				<a class="cf-auth-page__brand" href="{{AppSubURL}}/">
+					<img src="{{AppSubURL}}/img/codeforge-mark.svg" alt="" width="28" height="28"> <span>{{AppName}}</span>
+				</a>
+				<h1>{{.i18n.Tr "auth.forgot_password"}}</h1>
+				<p class="cf-mute">Recover access to your CodeForge account</p>
+			</header>
+			<form class="ui form cf-auth-card__body" action="{{.Link}}" method="post">
+				{{.CSRFTokenHTML}}
+				{{template "base/alert" .}}
+				{{if .IsResetSent}}
+					<div class="ui positive message"><p>{{.i18n.Tr "auth.confirmation_mail_sent_prompt" .Email .Hours | Str2HTML}}</p></div>
+				{{else if .IsResetRequest}}
+					<div class="cf-field {{if .Err_Email}}is-error{{end}}">
+						<label class="cf-field__label" for="email">{{.i18n.Tr "email"}}</label>
+						<input id="email" class="cf-input" name="email" type="email" value="{{.Email}}" autocomplete="email" autofocus required>
+						<span class="cf-field__hint">We'll send a password reset link to this address.</span>
+					</div>
+					<button class="cf-btn cf-btn--primary cf-btn--block cf-mt-2" type="submit">{{.i18n.Tr "auth.send_reset_mail"}}</button>
+				{{else if .IsResetDisable}}
+					<div class="ui warning message"><p>{{.i18n.Tr "auth.disable_register_mail"}}</p></div>
+				{{else if .ResendLimited}}
+					<div class="ui warning message"><p>{{.i18n.Tr "auth.resent_limit_prompt"}}</p></div>
+				{{end}}
+				<p class="cf-text-center cf-mute cf-mt-4"><a href="{{AppSubURL}}/user/login">&larr; {{.i18n.Tr "sign_in"}}</a></p>
+			</form>
+		</section>
+	</div>
+</main>
+{{template "base/footer" .}}

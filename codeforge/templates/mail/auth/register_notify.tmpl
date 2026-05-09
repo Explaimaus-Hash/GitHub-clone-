@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>{{.Username}}, welcome to {{AppName}}</title>
+	<style>
+		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; background-color: #f4f4f5; color: #18181b; padding: 20px; }
+		.container { background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); max-width: 600px; margin: 0 auto; }
+		.btn { display: inline-block; background-color: #0ea5e9; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: 500; margin-top: 10px; margin-bottom: 10px; }
+		.footer { margin-top: 30px; font-size: 12px; color: #71717a; text-align: center; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h2>Registration Confirmed</h2>
+		<p>Hi <b>{{.Username}}</b>, this is your registration confirmation email for {{AppName}}!</p>
+		<p>You can now login via username: <b>{{.Username}}</b>.</p>
+		<p><a class="btn" href="{{AppURL}}user/login" style="color: #ffffff;">Login to {{AppName}}</a></p>
+		<div class="footer">
+			<p>&copy; {{Year}} <a target="_blank" rel="noopener noreferrer" href="{{AppURL}}">{{AppName}}</a></p>
+		</div>
+	</div>
+</body>
+</html>

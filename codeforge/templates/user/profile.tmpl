@@ -1,0 +1,98 @@
+{{template "base/head" .}}
+<main class="cf-user-profile user profile">
+	<div class="cf-user-profile__inner ui container">
+		<div class="cf-user-profile__grid ui grid">
+			<aside class="cf-user-profile__aside ui five wide column">
+				<div class="cf-profile-card cf-card">
+					{{if eq .LoggedUserName .Owner.Name}}
+						<a class="cf-profile-card__avatar profile-avatar image poping up" href="{{AppSubURL}}/user/settings/avatar" id="profile-avatar" data-content="{{.i18n.Tr "user.change_avatar"}}" data-variation="inverted tiny" data-position="bottom center">
+							<img src="{{AppendAvatarSize .Owner.AvatarURLPath 287}}" alt="{{.Owner.Name}}"/>
+							<span class="cf-profile-card__avatar-edit"><i class="octicon octicon-pencil"></i></span>
+						</a>
+					{{else}}
+						<span class="cf-profile-card__avatar profile-avatar image">
+							<img src="{{AppendAvatarSize .Owner.AvatarURLPath 287}}" alt="{{.Owner.Name}}"/>
+						</span>
+					{{end}}
+
+					<div class="cf-profile-card__body content">
+						{{if .Owner.FullName}}<h2 class="cf-profile-card__fullname header text center">{{.Owner.FullName}}</h2>{{end}}
+						<div class="cf-profile-card__handle username text center">@{{.Owner.Name}}</div>
+					</div>
+
+					<ul class="cf-profile-card__meta extra content">
+						{{if .Owner.Location}}
+							<li><i class="octicon octicon-location"></i> <span>{{.Owner.Location}}</span></li>
+						{{end}}
+						{{if and .Owner.Email .IsLogged}}
+							<li><i class="octicon octicon-mail"></i> <a href="mailto:{{.Owner.Email}}" rel="nofollow">{{.Owner.Email}}</a></li>
+						{{end}}
+						{{if .Owner.Website}}
+							<li><i class="octicon octicon-link"></i> <a target="_blank" rel="noopener noreferrer me nofollow" href="{{.Owner.Website}}">{{.Owner.Website}}</a></li>
+						{{end}}
+						<li><i class="octicon octicon-clock"></i> <span>{{.i18n.Tr "user.join_on"}} {{DateFmtShort .Owner.Created}}</span></li>
+						<li>
+							<i class="octicon octicon-person"></i>
+							<a href="{{.Owner.HomeURLPath}}/followers">{{.Owner.NumFollowers}} {{.i18n.Tr "user.followers"}}</a>
+							<span class="cf-subtle"> &middot; </span>
+							<a href="{{.Owner.HomeURLPath}}/following">{{.Owner.NumFollowing}} {{.i18n.Tr "user.following"}}</a>
+						</li>
+					</ul>
+
+					{{if .Orgs}}
+						<div class="cf-profile-card__orgs">
+							<div class="cf-profile-card__orgs-heading">Organizations</div>
+							<div class="cf-profile-card__orgs-list">
+								{{range .Orgs}}
+									<a href="{{.HomeURLPath}}" class="cf-profile-card__org poping up" data-content="{{.Name}}" data-position="top center" data-variation="tiny inverted">
+										<img src="{{.AvatarURLPath}}" alt="">
+									</a>
+								{{end}}
+							</div>
+						</div>
+					{{end}}
+
+					{{if and .IsLogged (ne .LoggedUserName .Owner.Name)}}
+						<div class="cf-profile-card__follow follow">
+							{{if .LoggedUser.IsFollowing .Owner.ID}}
+								<form action="{{.Link}}/action/unfollow?redirect_to={{$.Link}}" method="POST">
+									{{.CSRFTokenHTML}}
+									<button class="cf-btn cf-btn--block cf-btn--danger" type="submit">
+										<i class="octicon octicon-person"></i> {{.i18n.Tr "user.unfollow"}}
+									</button>
+								</form>
+							{{else}}
+								<form action="{{.Link}}/action/follow?redirect_to={{$.Link}}" method="POST">
+									{{.CSRFTokenHTML}}
+									<button class="cf-btn cf-btn--block cf-btn--primary" type="submit">
+										<i class="octicon octicon-person"></i> {{.i18n.Tr "user.follow"}}
+									</button>
+								</form>
+							{{end}}
+						</div>
+					{{end}}
+				</div>
+			</aside>
+
+			<section class="cf-user-profile__content ui eleven wide column">
+				<div class="cf-tabs ui secondary pointing menu">
+					<a class="cf-tabs__item item {{if ne .TabName "activity"}}is-active active{{end}}" href="{{.Owner.HomeURLPath}}">
+						<i class="octicon octicon-repo"></i> {{.i18n.Tr "user.repositories"}}
+					</a>
+					<a class="cf-tabs__item item {{if eq .TabName "activity"}}is-active active{{end}}" href="{{.Owner.HomeURLPath}}?tab=activity">
+						<i class="octicon octicon-rss"></i> {{.i18n.Tr "user.activity"}}
+					</a>
+				</div>
+				{{if ne .TabName "activity"}}
+					{{template "explore/repo_list" .}}
+					{{template "explore/page" .}}
+				{{else}}
+					<div class="cf-feed feeds">
+						{{template "user/dashboard/feeds" .}}
+					</div>
+				{{end}}
+			</section>
+		</div>
+	</div>
+</main>
+{{template "base/footer" .}}

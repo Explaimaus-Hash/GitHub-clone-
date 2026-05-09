@@ -1,0 +1,106 @@
+{{template "base/head" .}}
+<main class="cf-repo cf-repo--home repository file list">
+	{{template "repo/header" .}}
+	<div class="cf-repo__inner ui container">
+		{{template "base/alert" .}}
+		{{if .PageIsRepoHome}}
+			<section class="cf-repo-summary">
+				<p class="cf-repo-summary__desc" id="repo-desc">
+					{{if .Repository.Description}}<span class="description has-emoji">{{.Repository.Description | NewLine2br | Str2HTML}}</span>{{else}}<span class="cf-repo-summary__desc--empty no-description text-italic">{{.i18n.Tr "repo.no_desc"}}</span>{{end}}
+					{{if .Repository.Website}}<a class="cf-repo-summary__link link" href="{{.Repository.Website}}">{{.Repository.Website}}</a>{{end}}
+				</p>
+				<div class="cf-repo-stats ui segment" id="git-stats">
+					<a class="cf-repo-stats__item" href="{{.RepoLink}}/commits/{{EscapePound .BranchName}}">
+						<i class="octicon octicon-history"></i>
+						<strong>{{.CommitsCount}}</strong>
+						<span>{{.i18n.Tr "repo.commits"}}</span>
+					</a>
+					<a class="cf-repo-stats__item" href="{{.RepoLink}}/branches">
+						<i class="octicon octicon-git-branch"></i>
+						<strong>{{.BranchCount}}</strong>
+						<span>{{.i18n.Tr "repo.git_branches"}}</span>
+					</a>
+					<a class="cf-repo-stats__item" href="{{.RepoLink}}/releases">
+						<i class="octicon octicon-tag"></i>
+						<strong>{{.Repository.NumTags}}</strong>
+						<span>{{.i18n.Tr "repo.releases"}}</span>
+					</a>
+				</div>
+			</section>
+		{{end}}
+		<section class="cf-repo-toolbar ui secondary menu">
+			{{if .PullRequestCtx.Allowed}}
+				<div class="cf-repo-toolbar__compare fitted item">
+					<a href="{{.BaseRepo.Link}}/compare/{{EscapePound .BaseRepo.DefaultBranch}}...{{EscapePound .PullRequestCtx.HeadInfo}}">
+						<button class="cf-btn cf-btn--success ui green small button"><i class="octicon octicon-git-compare"></i></button>
+					</a>
+				</div>
+			{{end}}
+			{{template "repo/branch_dropdown" .}}
+			<div class="cf-repo-toolbar__path fitted item">
+				<div class="cf-breadcrumb ui breadcrumb">
+					<a class="cf-breadcrumb__root section" href="{{.RepoLink}}/src/{{EscapePound .BranchName}}">{{EllipsisString .Repository.Name 15}}</a>
+					{{ $n := len .TreeNames}}
+					{{ $l := Subtract $n 1}}
+					{{range $i, $v := .TreeNames}}
+						<span class="cf-breadcrumb__sep divider">/</span>
+						{{if eq $i $l}}
+							<span class="cf-breadcrumb__active active section">{{$v}}</span>
+						{{else}}
+							{{ $p := index $.Paths $i}}
+							<span class="cf-breadcrumb__crumb section"><a href="{{EscapePound $.BranchLink}}/{{EscapePound $p}}">{{$v}}</a></span>
+						{{end}}
+					{{end}}
+				</div>
+			</div>
+			<div class="cf-repo-toolbar__right right fitted item">
+				{{if .Repository.CanEnableEditor}}
+					<div id="file-buttons" class="cf-repo-toolbar__file-actions ui tiny blue buttons">
+						{{if .CanAddFile}}
+							<a href="{{.RepoLink}}/_new/{{EscapePound .BranchName}}/{{EscapePound .TreePath}}" class="cf-btn cf-btn--ghost ui button">
+								<i class="octicon octicon-plus"></i> {{.i18n.Tr "repo.editor.new_file"}}
+							</a>
+						{{end}}
+						{{if .CanUploadFile}}
+							<a href="{{.RepoLink}}/_upload/{{EscapePound .BranchName}}/{{EscapePound .TreePath}}" class="cf-btn cf-btn--ghost ui button">
+								<i class="octicon octicon-cloud-upload"></i> {{.i18n.Tr "repo.editor.upload_file"}}
+							</a>
+						{{end}}
+					</div>
+				{{end}}
+
+				{{if eq $n 0}}
+					<div class="cf-clone-panel ui action small input" id="clone-panel">
+						{{if not $.DisableHTTP}}
+							<button class="cf-clone-panel__protocol ui basic clone button" id="repo-clone-https" data-link="{{.CloneLink.HTTPS}}">
+								{{if UseHTTPS}}HTTPS{{else}}HTTP{{end}}
+							</button>
+						{{end}}
+						{{if not $.DisableSSH}}
+							<button class="cf-clone-panel__protocol ui basic clone button" id="repo-clone-ssh" data-link="{{.CloneLink.SSH}}">
+								SSH
+							</button>
+						{{end}}
+						<input class="cf-clone-panel__url" id="repo-clone-url" value="{{if not $.DisableHTTP}}{{$.CloneLink.HTTPS}}{{else}}{{$.CloneLink.SSH}}{{end}}" readonly>
+						<button class="cf-clone-panel__copy ui basic icon button poping up clipboard" id="clipboard-btn" data-original="{{.i18n.Tr "repo.copy_link"}}" data-success="{{.i18n.Tr "repo.copy_link_success"}}" data-error="{{.i18n.Tr "repo.copy_link_error"}}" data-content="{{.i18n.Tr "repo.copy_link"}}" data-variation="inverted tiny" data-clipboard-target="#repo-clone-url">
+							<i class="octicon octicon-clippy"></i>
+						</button>
+						<div class="cf-clone-panel__download ui basic jump dropdown icon button">
+							<i class="download icon"></i>
+							<div class="menu">
+								<a class="item" href="{{$.RepoLink}}/archive/{{EscapePound $.BranchName}}.zip"><i class="octicon octicon-file-zip"></i> ZIP</a>
+								<a class="item" href="{{$.RepoLink}}/archive/{{EscapePound $.BranchName}}.tar.gz"><i class="octicon octicon-file-zip"></i> TAR.GZ</a>
+							</div>
+						</div>
+					</div>
+				{{end}}
+			</div>
+		</section>
+		{{if .IsViewFile}}
+			{{template "repo/view_file" .}}
+		{{else}}
+			{{template "repo/view_list" .}}
+		{{end}}
+	</div>
+</main>
+{{template "base/footer" .}}

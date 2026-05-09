@@ -1,0 +1,36 @@
+{{/* CodeForge user-settings sidebar */}}
+<aside class="cf-settings-aside four wide column">
+	<nav class="cf-settings-nav ui vertical menu" aria-label="User settings">
+		<div class="cf-settings-nav__heading header item">{{.i18n.Tr "settings"}}</div>
+		<a class="cf-settings-nav__item item {{if .PageIsSettingsProfile}}is-active active{{end}}" href="{{AppSubURL}}/user/settings">
+			<i class="octicon octicon-person"></i> {{.i18n.Tr "settings.profile"}}
+		</a>
+		<a class="cf-settings-nav__item item {{if .PageIsSettingsAvatar}}is-active active{{end}}" href="{{AppSubURL}}/user/settings/avatar">
+			<i class="octicon octicon-file-media"></i> {{.i18n.Tr "settings.avatar"}}
+		</a>
+		<a class="cf-settings-nav__item item {{if .PageIsSettingsPassword}}is-active active{{end}}" href="{{AppSubURL}}/user/settings/password">
+			<i class="octicon octicon-key"></i> {{.i18n.Tr "settings.password"}}
+		</a>
+		<a class="cf-settings-nav__item item {{if .PageIsSettingsEmails}}is-active active{{end}}" href="{{AppSubURL}}/user/settings/email">
+			<i class="octicon octicon-mail"></i> {{.i18n.Tr "settings.emails"}}
+		</a>
+		<a class="cf-settings-nav__item item {{if .PageIsSettingsSSHKeys}}is-active active{{end}}" href="{{AppSubURL}}/user/settings/ssh">
+			<i class="octicon octicon-terminal"></i> {{.i18n.Tr "settings.ssh_keys"}}
+		</a>
+		<a class="cf-settings-nav__item item {{if .PageIsSettingsSecurity}}is-active active{{end}}" href="{{AppSubURL}}/user/settings/security">
+			<i class="octicon octicon-shield"></i> {{.i18n.Tr "settings.security"}}
+		</a>
+		<a class="cf-settings-nav__item item {{if .PageIsSettingsRepositories}}is-active active{{end}}" href="{{AppSubURL}}/user/settings/repositories">
+			<i class="octicon octicon-repo"></i> {{.i18n.Tr "settings.repos"}}
+		</a>
+		<a class="cf-settings-nav__item item {{if .PageIsSettingsOrganizations}}is-active active{{end}}" href="{{AppSubURL}}/user/settings/organizations">
+			<i class="octicon octicon-organization"></i> {{.i18n.Tr "settings.orgs"}}
+		</a>
+		<a class="cf-settings-nav__item item {{if .PageIsSettingsApplications}}is-active active{{end}}" href="{{AppSubURL}}/user/settings/applications">
+			<i class="octicon octicon-plug"></i> {{.i18n.Tr "settings.applications"}}
+		</a>
+		<a class="cf-settings-nav__item cf-settings-nav__item--danger item {{if .PageIsSettingsDelete}}is-active active{{end}}" href="{{AppSubURL}}/user/settings/delete">
+			<i class="octicon octicon-trashcan"></i> {{.i18n.Tr "settings.delete"}}
+		</a>
+	</nav>
+</aside>

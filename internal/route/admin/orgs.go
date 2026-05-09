@@ -1,0 +1,33 @@
+package admin
+
+import (
+	gocontext "context"
+
+	"github.com/Explaimaus-Hash/GitHub-clone-/internal/conf"
+	"github.com/Explaimaus-Hash/GitHub-clone-/internal/context"
+	"github.com/Explaimaus-Hash/GitHub-clone-/internal/database"
+	"github.com/Explaimaus-Hash/GitHub-clone-/internal/route"
+)
+
+const (
+	ORGS = "admin/org/list"
+)
+
+func Organizations(c *context.Context) {
+	c.Data["Title"] = c.Tr("admin.organizations")
+	c.Data["PageIsAdmin"] = true
+	c.Data["PageIsAdminOrganizations"] = true
+
+	route.RenderUserSearch(c, &route.UserSearchOptions{
+		Type: database.UserTypeOrganization,
+		Counter: func(gocontext.Context) int64 {
+			return database.CountOrganizations()
+		},
+		Ranger: func(_ gocontext.Context, page, pageSize int) ([]*database.User, error) {
+			return database.Organizations(page, pageSize)
+		},
+		PageSize: conf.UI.Admin.OrgPagingNum,
+		OrderBy:  "id ASC",
+		TplName:  ORGS,
+	})
+}

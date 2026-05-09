@@ -1,0 +1,55 @@
+<div class="cf-user-cards-page ui container user-cards">
+	<header class="cf-section-head ui dividing header">
+		<h2>{{.CardsTitle}}</h2>
+	</header>
+	<ul class="cf-user-cards list">
+		{{range .Cards}}
+			<li class="cf-user-card item ui segment">
+				<a class="cf-user-card__avatar-link" href="{{.HomeURLPath}}">
+					<img class="cf-user-card__avatar avatar" src="{{.AvatarURLPath}}" alt=""/>
+				</a>
+				<div class="cf-user-card__body">
+					<h3 class="cf-user-card__name name"><a href="{{.HomeURLPath}}">{{.DisplayName}}</a></h3>
+					<div class="cf-user-card__meta meta">
+						{{if .Website}}
+							<i class="octicon octicon-link"></i> <a href="{{.Website}}" target="_blank" rel="noopener noreferrer">{{.Website}}</a>
+						{{else if .Location}}
+							<i class="octicon octicon-location"></i> <span>{{.Location}}</span>
+						{{else}}
+							<i class="octicon octicon-clock"></i> <span>{{$.i18n.Tr "user.join_on"}} {{DateFmtShort .Created}}</span>
+						{{end}}
+					</div>
+				</div>
+				{{if $.IsAdmin}}
+					<form class="cf-user-card__action display inline" action="{{$.RepoLink}}/action/unwatch?redirect_to={{$.Link}}" method="POST">
+						{{$.CSRFTokenHTML}}
+						<input type="hidden" name="user_id" value="{{.ID}}">
+						<button class="cf-btn cf-btn--danger ui red small button">{{$.i18n.Tr "repo.unwatch"}}</button>
+					</form>
+				{{end}}
+			</li>
+		{{end}}
+	</ul>
+
+	{{with .Page}}
+		{{if gt .TotalPages 1}}
+			<nav class="cf-pagination center page buttons" aria-label="pagination">
+				<div class="ui borderless pagination menu">
+					<a class="cf-pagination__item {{if not .HasPrevious}}disabled{{end}} item" {{if .HasPrevious}}href="{{$.Link}}?page={{.Previous}}"{{end}}>
+						<i class="left arrow icon"></i> {{$.i18n.Tr "repo.issues.previous"}}
+					</a>
+					{{range .Pages}}
+						{{if eq .Num -1}}
+							<a class="cf-pagination__item disabled item">…</a>
+						{{else}}
+							<a class="cf-pagination__item {{if .IsCurrent}}is-current active{{end}} item" {{if not .IsCurrent}}href="{{$.Link}}?page={{.Num}}"{{end}}>{{.Num}}</a>
+						{{end}}
+					{{end}}
+					<a class="cf-pagination__item {{if not .HasNext}}disabled{{end}} item" {{if .HasNext}}href="{{$.Link}}?page={{.Next}}"{{end}}>
+						{{$.i18n.Tr "repo.issues.next"}}&nbsp;<i class="icon right arrow"></i>
+					</a>
+				</div>
+			</nav>
+		{{end}}
+	{{end}}
+</div>

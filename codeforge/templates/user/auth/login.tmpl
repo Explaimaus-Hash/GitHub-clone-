@@ -1,0 +1,74 @@
+{{template "base/head" .}}
+<main class="cf-auth-page user signin">
+	<div class="cf-auth-page__inner">
+		<aside class="cf-auth-page__aside" aria-hidden="true">
+			<a class="cf-auth-page__brand" href="{{AppSubURL}}/">
+				<img src="{{AppSubURL}}/img/codeforge-mark.svg" alt="" width="32" height="32">
+				<span>{{AppName}}</span>
+			</a>
+			<h2 class="cf-auth-page__pitch">Welcome back to your forge.</h2>
+			<p class="cf-auth-page__copy">Pick up where you left off &mdash; review pull requests, ship releases, and keep your team in flow.</p>
+			<ul class="cf-auth-page__bullets">
+				<li><span class="cf-auth-bullet"></span> Self-hosted, self-controlled</li>
+				<li><span class="cf-auth-bullet"></span> Issues, pulls, wikis &amp; releases</li>
+				<li><span class="cf-auth-bullet"></span> Two-factor &amp; SSH-key access</li>
+			</ul>
+		</aside>
+
+		<section class="cf-auth-card">
+			<header class="cf-auth-card__header">
+				<h1>{{.i18n.Tr "sign_in"}}</h1>
+				<p class="cf-mute">Sign in to your CodeForge account</p>
+			</header>
+			<form class="ui form cf-auth-card__body" action="{{.Link}}" method="post" novalidate>
+				{{.CSRFTokenHTML}}
+				{{template "base/alert" .}}
+
+				<div class="cf-field {{if .Err_UserName}}is-error{{end}}">
+					<label class="cf-field__label" for="user_name">{{.i18n.Tr "home.uname_holder"}}</label>
+					<input id="user_name" class="cf-input" name="user_name" value="{{.user_name}}" autocomplete="username" autofocus required>
+				</div>
+
+				<div class="cf-field {{if .Err_Password}}is-error{{end}}">
+					<label class="cf-field__label" for="password">{{.i18n.Tr "password"}}</label>
+					<input id="password" class="cf-input" name="password" type="password" autocomplete="current-password" value="{{.password}}" required>
+				</div>
+
+				{{if .LoginSources}}
+					<div class="cf-field {{if .Err_LoginSource}}is-error{{end}}">
+						<label class="cf-field__label">{{.i18n.Tr "auth.auth_source"}}</label>
+						<div class="ui selection dropdown">
+							<input type="hidden" id="login_source" name="login_source" value="{{.login_source}}" required>
+							<span class="text">
+								{{if .DefaultLoginSource}}{{.DefaultLoginSource.Name}}{{else}}{{.i18n.Tr "auth.local"}}{{end}}
+							</span>
+							<i class="dropdown icon"></i>
+							<div class="menu">
+								<div class="item" data-value="0">{{.i18n.Tr "auth.local"}}</div>
+								{{range .LoginSources}}
+									<div class="item" data-value="{{.ID}}">{{.Name}}</div>
+								{{end}}
+							</div>
+						</div>
+					</div>
+				{{end}}
+
+				<div class="cf-flex cf-items-center cf-justify-between cf-mt-2">
+					<label class="cf-checkbox">
+						<input name="remember" type="checkbox">
+						<span class="cf-checkbox__box">&#10003;</span>
+						<span>{{.i18n.Tr "auth.remember_me"}}</span>
+					</label>
+					<a class="cf-mute" href="{{AppSubURL}}/user/forget_password">{{.i18n.Tr "auth.forget_password"}}</a>
+				</div>
+
+				<button class="cf-btn cf-btn--primary cf-btn--block cf-btn--lg cf-mt-4" type="submit">{{.i18n.Tr "sign_in"}}</button>
+
+				{{if .ShowRegistrationButton}}
+					<p class="cf-text-center cf-mute cf-mt-4">{{.i18n.Tr "auth.sign_up_now" | Str2HTML}}</p>
+				{{end}}
+			</form>
+		</section>
+	</div>
+</main>
+{{template "base/footer" .}}

@@ -1,0 +1,29 @@
+{{template "base/head" .}}
+<main class="cf-auth-page user reset password">
+	<div class="cf-auth-page__inner cf-auth-page__inner--narrow">
+		<section class="cf-auth-card">
+			<header class="cf-auth-card__header">
+				<a class="cf-auth-page__brand" href="{{AppSubURL}}/">
+					<img src="{{AppSubURL}}/img/codeforge-mark.svg" alt="" width="28" height="28"> <span>{{AppName}}</span>
+				</a>
+				<h1>{{.i18n.Tr "auth.reset_password"}}</h1>
+				<p class="cf-mute">Set a new password for your account</p>
+			</header>
+			<form class="ui form cf-auth-card__body" action="{{.Link}}" method="post">
+				{{.CSRFTokenHTML}}
+				<input name="code" type="hidden" value="{{.Code}}">
+				{{template "base/alert" .}}
+				{{if .IsResetForm}}
+					<div class="cf-field {{if .Err_Password}}is-error{{end}}">
+						<label class="cf-field__label" for="password">{{.i18n.Tr "password"}}</label>
+						<input id="password" class="cf-input" name="password" type="password" value="{{.password}}" autocomplete="new-password" autofocus required>
+					</div>
+					<button class="cf-btn cf-btn--primary cf-btn--block cf-mt-2" type="submit">{{.i18n.Tr "auth.reset_password_helper"}}</button>
+				{{else}}
+					<div class="ui warning message"><p>{{.i18n.Tr "auth.invalid_code"}}</p></div>
+				{{end}}
+			</form>
+		</section>
+	</div>
+</main>
+{{template "base/footer" .}}

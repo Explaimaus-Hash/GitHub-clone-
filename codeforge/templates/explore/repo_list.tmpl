@@ -1,0 +1,38 @@
+{{/* CodeForge explore repo list */}}
+<div class="cf-repo-cards ui repository list">
+	{{range .Repos}}
+		<article class="cf-repo-card item">
+			<div class="cf-repo-card__icon">
+				{{if .RelAvatarLink}}
+					<img src="{{.RelAvatarLink}}" alt="">
+				{{else}}
+					<i class="octicon octicon-repo"></i>
+				{{end}}
+			</div>
+			<div class="cf-repo-card__body">
+				<div class="cf-repo-card__head">
+					<a class="cf-repo-card__name name" href="{{AppSubURL}}/{{if .Owner}}{{.Owner.Name}}{{else if $.Org}}{{$.Org.Name}}{{else}}{{$.Owner.Name}}{{end}}/{{.Name}}">
+						{{if $.PageIsExplore}}<span class="cf-repo-card__owner">{{.Owner.Name}}</span> / {{end}}<strong>{{.Name}}</strong>
+					</a>
+					{{if .IsPrivate}}<span class="cf-badge cf-badge--gold" title="Private"><i class="octicon octicon-lock"></i> private</span>
+					{{else if .IsUnlisted}}<span class="cf-badge" title="Unlisted"><i class="octicon octicon-eye"></i> unlisted</span>
+					{{else if .IsFork}}<span class="cf-badge" title="Fork"><i class="octicon octicon-repo-forked"></i> fork</span>
+					{{else if .IsMirror}}<span class="cf-badge" title="Mirror"><i class="octicon octicon-repo-clone"></i> mirror</span>
+					{{end}}
+				</div>
+				{{if .Description}}<p class="cf-repo-card__desc has-emoji">{{.Description | Str2HTML}}</p>{{end}}
+				<div class="cf-repo-card__meta">
+					<span><i class="octicon octicon-star"></i> {{.NumStars}}</span>
+					<span><i class="octicon octicon-git-branch"></i> {{.NumForks}}</span>
+					<span class="cf-subtle">{{$.i18n.Tr "org.repo_updated"}} {{TimeSince .Updated $.i18n.Lang}}</span>
+				</div>
+			</div>
+		</article>
+	{{else}}
+		<div class="cf-empty">
+			<div class="cf-empty__icon"><i class="octicon octicon-repo"></i></div>
+			<div class="cf-empty__title">No repositories yet</div>
+			<p class="cf-mute">There's nothing to show here. Create or migrate a repo to get started.</p>
+		</div>
+	{{end}}
+</div>

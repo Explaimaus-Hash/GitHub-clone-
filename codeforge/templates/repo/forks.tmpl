@@ -1,0 +1,22 @@
+{{template "base/head" .}}
+<main class="cf-repo cf-repo--forks repository forks">
+	{{template "repo/header" .}}
+	<div class="cf-repo__inner ui container">
+		<header class="cf-section-head ui dividing header">
+			<h2><i class="octicon octicon-repo-forked"></i> {{.i18n.Tr "repo.forks"}}</h2>
+		</header>
+		<ul class="cf-fork-list ui list">
+			{{range .Forks}}
+				<li class="cf-fork-list__item item">
+					<img class="cf-fork-list__avatar ui avatar image" src="{{.Owner.AvatarURLPath}}" alt="">
+					<div class="cf-fork-list__link link">
+						<a href="{{AppSubURL}}/{{.Owner.Name}}">{{.Owner.Name}}</a>
+						<span class="cf-fork-list__sep">/</span>
+						<a href="{{AppSubURL}}/{{.Owner.Name}}/{{.Name}}"><strong>{{.Name}}</strong></a>
+					</div>
+				</li>
+			{{end}}
+		</ul>
+	</div>
+</main>
+{{template "base/footer" .}}

@@ -1,0 +1,39 @@
+{{template "base/head" .}}
+<main class="cf-explore explore users">
+	<div class="cf-explore__inner ui container">
+		<header class="cf-page-header">
+			<div class="cf-page-header__title">
+				<h1>{{.i18n.Tr "explore"}}</h1>
+				<span class="cf-subtitle">People on this CodeForge instance.</span>
+			</div>
+		</header>
+		<div class="cf-explore__grid">
+			{{template "explore/navbar" .}}
+			<section class="cf-explore__content">
+				{{template "explore/search" .}}
+				<div class="cf-user-cards ui user list">
+					{{range .Users}}
+						<article class="cf-user-card item">
+							<img class="cf-avatar cf-avatar--lg" src="{{.AvatarURLPath}}" alt="">
+							<div class="cf-user-card__body">
+								<a class="cf-user-card__name header" href="{{.HomeURLPath}}"><strong>{{.Name}}</strong>{{if .FullName}} <span class="cf-mute">{{.FullName}}</span>{{end}}</a>
+								<div class="cf-user-card__meta description">
+									{{if .Location}}<span><i class="octicon octicon-location"></i> {{.Location}}</span>{{end}}
+									{{if and .Email $.IsLogged}}<span><i class="octicon octicon-mail"></i> <a href="mailto:{{.Email}}" rel="nofollow">{{.Email}}</a></span>{{end}}
+									<span><i class="octicon octicon-clock"></i> {{$.i18n.Tr "user.join_on"}} {{DateFmtShort .Created}}</span>
+								</div>
+							</div>
+						</article>
+					{{else}}
+						<div class="cf-empty">
+							<div class="cf-empty__icon"><i class="octicon octicon-person"></i></div>
+							<div class="cf-empty__title">No users found</div>
+						</div>
+					{{end}}
+				</div>
+				{{template "explore/page" .}}
+			</section>
+		</div>
+	</div>
+</main>
+{{template "base/footer" .}}

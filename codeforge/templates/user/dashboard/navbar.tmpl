@@ -1,0 +1,45 @@
+{{/* CodeForge dashboard navbar — context switcher + (org) sub-nav */}}
+<div class="cf-dash-navbar">
+	<div class="cf-dash-navbar__inner ui container">
+		<div class="ui floating dropdown link jump cf-dash-navbar__context">
+			<span class="text cf-flex cf-items-center cf-gap-2">
+				<span class="cf-avatar cf-avatar--sm"><img src="{{.ContextUser.AvatarURLPath}}" alt=""></span>
+				<strong>{{.ContextUser.ShortName 20}}</strong>
+				<i class="dropdown icon"></i>
+			</span>
+			<div class="context user overflow menu" tabindex="-1">
+				<div class="header">{{.i18n.Tr "home.switch_dashboard_context"}}</div>
+				<div class="items">
+					<a class="{{if eq .ContextUser.ID .LoggedUser.ID}}active selected{{end}} item" href="{{AppSubURL}}/{{if .PageIsIssues}}issues{{else if .PageIsPulls}}pulls{{end}}">
+						<img class="ui avatar image" src="{{.LoggedUser.AvatarURLPath}}"> {{.LoggedUser.Name}}
+					</a>
+					{{range .Orgs}}
+						<a class="{{if eq $.ContextUser.ID .ID}}active selected{{end}} item" href="{{AppSubURL}}/org/{{.Name}}/{{if $.PageIsIssues}}issues{{else if $.PageIsPulls}}pulls{{else}}dashboard{{end}}">
+							<img class="ui avatar image" src="{{.AvatarURLPath}}"> {{.ShortName 20}}
+						</a>
+					{{end}}
+				</div>
+				<a class="item" href="{{AppSubURL}}/org/create">
+					<i class="octicon octicon-plus"></i> {{.i18n.Tr "new_org"}}
+				</a>
+			</div>
+		</div>
+
+		{{if .ContextUser.IsOrganization}}
+			<nav class="cf-dash-navbar__nav" aria-label="Organization">
+				<a class="{{if .PageIsNews}}is-active{{end}}" href="{{AppSubURL}}/org/{{.ContextUser.Name}}/dashboard">
+					<i class="octicon octicon-rss"></i> {{.i18n.Tr "activities"}}
+				</a>
+				<a class="{{if .PageIsIssues}}is-active{{end}}" href="{{AppSubURL}}/org/{{.ContextUser.Name}}/issues">
+					<i class="octicon octicon-issue-opened"></i> {{.i18n.Tr "issues"}}
+				</a>
+				<a class="{{if .PageIsPulls}}is-active{{end}}" href="{{AppSubURL}}/org/{{.ContextUser.Name}}/pulls">
+					<i class="octicon octicon-git-pull-request"></i> {{.i18n.Tr "pull_requests"}}
+				</a>
+			</nav>
+			<a class="cf-btn cf-btn--secondary cf-dash-navbar__view" href="{{.ContextUser.HomeURLPath}}">
+				{{.i18n.Tr "home.view_home" (.ContextUser.ShortName 10)}}
+			</a>
+		{{end}}
+	</div>
+</div>

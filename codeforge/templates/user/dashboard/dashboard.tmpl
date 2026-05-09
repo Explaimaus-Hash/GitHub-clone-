@@ -1,0 +1,128 @@
+{{template "base/head" .}}
+<main class="cf-dashboard dashboard feeds">
+	{{template "user/dashboard/navbar" .}}
+
+	<div class="cf-dashboard__inner ui container">
+		<div class="cf-dashboard__grid">
+			<section class="cf-dashboard__feed">
+				<header class="cf-page-header">
+					<div class="cf-page-header__title">
+						<h1>{{.i18n.Tr "activities"}}</h1>
+						<span class="cf-subtitle">Latest activity across your repositories.</span>
+					</div>
+					<div class="cf-page-header__actions">
+						<a class="cf-btn cf-btn--primary" href="{{AppSubURL}}/repo/create{{if .ContextUser.IsOrganization}}?org={{.ContextUser.ID}}{{end}}">
+							<svg class="cf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+							{{.i18n.Tr "new_repo"}}
+						</a>
+					</div>
+				</header>
+
+				<div class="cf-feed">
+					{{template "user/dashboard/feeds" .}}
+				</div>
+
+				{{if .AfterID}}
+					<button class="cf-btn cf-btn--ghost cf-btn--block ajax-load-button cf-mt-4" data-url="{{.Link}}?after_id={{.AfterID}}">More</button>
+				{{end}}
+			</section>
+
+			<aside class="cf-dashboard__aside">
+				<div class="cf-card cf-aside-card">
+					<div class="ui {{if not .ContextUser.IsOrganization}}three{{else}}two{{end}} item tabable menu cf-aside-card__tabs">
+						<a class="item active" data-tab="repos">{{.i18n.Tr "repository"}}</a>
+						{{if not .ContextUser.IsOrganization}}
+							<a class="item" data-tab="orgs">{{.i18n.Tr "organization"}}</a>
+						{{end}}
+						<a class="item" data-tab="mirrors">{{.i18n.Tr "mirror"}}</a>
+					</div>
+
+					<div class="ui tab active list cf-aside-card__panel" data-tab="repos">
+						<div class="cf-aside-card__head">
+							<h4>{{.i18n.Tr "home.my_repos"}} <span class="cf-badge">{{.RepoCount}}</span></h4>
+							<a class="cf-btn cf-btn--ghost cf-btn--icon cf-btn--sm poping up" href="{{AppSubURL}}/repo/create{{if .ContextUser.IsOrganization}}?org={{.ContextUser.ID}}{{end}}" data-content="{{.i18n.Tr "new_repo"}}" data-variation="tiny inverted" data-position="left center" aria-label="{{.i18n.Tr "new_repo"}}">
+								<svg class="cf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+							</a>
+						</div>
+						<ul class="cf-repo-list repo-owner-name-list">
+							{{range .Repos}}
+								<li {{if .IsPrivate}}class="private"{{end}}>
+									<a href="{{AppSubURL}}/{{$.ContextUser.Name}}/{{.Name}}">
+										<i class="octicon octicon-{{if .IsFork}}repo-forked{{else if .IsPrivate}}lock{{else if .IsMirror}}repo-clone{{else}}repo{{end}}"></i>
+										<strong class="cf-repo-list__name item-name">{{.Name}}</strong>
+										<span class="cf-repo-list__meta"><i class="octicon octicon-star"></i> {{.NumStars}}</span>
+									</a>
+								</li>
+							{{end}}
+							{{if gt .ContextUser.NumRepos .MaxShowRepoNum}}
+								<li><a class="cf-mute" href="{{.ContextUser.HomeURLPath}}">{{.i18n.Tr "home.show_more_repos"}} &rarr;</a></li>
+							{{end}}
+						</ul>
+
+						{{if not .ContextUser.IsOrganization}}
+							<div class="cf-aside-card__head cf-mt-4">
+								<h4>{{.i18n.Tr "home.collaborative_repos"}}</h4>
+							</div>
+							<ul class="cf-repo-list" id="collaborative-repo-list">
+								{{range .CollaborativeRepos}}
+									<li {{if .IsPrivate}}class="private"{{end}}>
+										<a href="{{AppSubURL}}/{{.Owner.Name}}/{{.Name}}">
+											<i class="octicon octicon-{{if .IsPrivate}}lock{{else if .IsFork}}repo-forked{{else if .IsMirror}}repo-clone{{else}}repo{{end}}"></i>
+											<span class="cf-repo-list__name owner-and-repo">
+												<span class="cf-mute owner-name">{{.Owner.Name}}</span> / <strong>{{.Name}}</strong>
+											</span>
+											<span class="cf-repo-list__meta"><i class="octicon octicon-star"></i> {{.NumStars}}</span>
+										</a>
+									</li>
+								{{end}}
+							</ul>
+						{{end}}
+					</div>
+
+					{{if not .ContextUser.IsOrganization}}
+						<div class="ui tab list cf-aside-card__panel" data-tab="orgs">
+							<div class="cf-aside-card__head">
+								<h4>{{.i18n.Tr "home.my_orgs"}} <span class="cf-badge">{{.ContextUser.GetOrganizationCount}}</span></h4>
+								{{if .LoggedUser.CanCreateOrganization}}
+									<a class="cf-btn cf-btn--ghost cf-btn--icon cf-btn--sm poping up" href="{{AppSubURL}}/org/create" data-content="{{.i18n.Tr "new_org"}}" data-variation="tiny inverted" data-position="left center" aria-label="{{.i18n.Tr "new_org"}}">
+										<svg class="cf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+									</a>
+								{{end}}
+							</div>
+							<ul class="cf-repo-list repo-owner-name-list">
+								{{range .Orgs}}
+									<li><a href="{{AppSubURL}}/{{.Name}}">
+										<i class="octicon octicon-organization"></i>
+										<strong class="cf-repo-list__name item-name">{{.Name}}</strong>
+										<span class="cf-repo-list__meta"><i class="octicon octicon-repo"></i> {{.NumRepos}}</span>
+									</a></li>
+								{{end}}
+							</ul>
+						</div>
+					{{end}}
+
+					<div class="ui tab list cf-aside-card__panel" data-tab="mirrors">
+						<div class="cf-aside-card__head">
+							<h4>{{.i18n.Tr "home.my_mirrors"}} <span class="cf-badge">{{.MirrorCount}}</span></h4>
+							<a class="cf-btn cf-btn--ghost cf-btn--icon cf-btn--sm poping up" href="{{AppSubURL}}/repo/migrate?mirror=1{{if .ContextUser.IsOrganization}}&org={{.ContextUser.ID}}{{end}}" data-content="{{.i18n.Tr "new_mirror"}}" data-variation="tiny inverted" data-position="left center" aria-label="{{.i18n.Tr "new_mirror"}}">
+								<svg class="cf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+							</a>
+						</div>
+						<ul class="cf-repo-list repo-owner-name-list">
+							{{range .Mirrors}}
+								<li {{if .IsPrivate}}class="private"{{end}}>
+									<a href="{{AppSubURL}}/{{$.ContextUser.Name}}/{{.Name}}">
+										<i class="octicon octicon-repo-clone"></i>
+										<strong class="cf-repo-list__name item-name">{{.Name}}</strong>
+										<span class="cf-repo-list__meta"><i class="octicon octicon-sync"></i> {{.Interval}}H</span>
+									</a>
+								</li>
+							{{end}}
+						</ul>
+					</div>
+				</div>
+			</aside>
+		</div>
+	</div>
+</main>
+{{template "base/footer" .}}

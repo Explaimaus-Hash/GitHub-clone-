@@ -1,0 +1,15 @@
+{{/* CodeForge explore sidebar */}}
+<aside class="cf-explore-aside">
+	<nav class="cf-explore-nav" aria-label="Explore">
+		<div class="cf-explore-nav__heading">{{.i18n.Tr "explore"}}</div>
+		<a class="cf-explore-nav__item {{if .PageIsExploreRepositories}}is-active{{end}}" href="{{AppSubURL}}/explore/repos">
+			<i class="octicon octicon-repo"></i> <span>{{.i18n.Tr "explore.repos"}}</span>
+		</a>
+		<a class="cf-explore-nav__item {{if .PageIsExploreUsers}}is-active{{end}}" href="{{AppSubURL}}/explore/users">
+			<i class="octicon octicon-person"></i> <span>{{.i18n.Tr "explore.users"}}</span>
+		</a>
+		<a class="cf-explore-nav__item {{if .PageIsExploreOrganizations}}is-active{{end}}" href="{{AppSubURL}}/explore/organizations">
+			<i class="octicon octicon-organization"></i> <span>{{.i18n.Tr "explore.organizations"}}</span>
+		</a>
+	</nav>
+</aside>

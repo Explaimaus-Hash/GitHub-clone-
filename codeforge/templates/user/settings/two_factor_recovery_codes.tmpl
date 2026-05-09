@@ -1,0 +1,38 @@
+{{template "base/head" .}}
+<main class="cf-settings user settings security two-factor">
+	<div class="ui container">
+		<div class="ui grid">
+			{{template "user/settings/navbar" .}}
+			<section class="cf-settings__content twelve wide column content">
+				{{template "base/alert" .}}
+				<h4 class="cf-settings__header ui top attached header">
+					{{.i18n.Tr "settings.two_factor_recovery_codes_title"}}
+				</h4>
+				<div class="cf-settings__segment ui attached segment">
+					<p class="cf-subtle">{{.i18n.Tr "settings.two_factor_recovery_codes_desc" | Safe}}</p>
+				 	<ul class="ui list">
+						{{range .RecoveryCodes}}
+							<li class="item">
+								<code>
+									{{if .IsUsed}}
+										<del>{{.Code}}</del>
+									{{else}}
+										{{.Code}}
+									{{end}}
+								</code>
+							</li>
+						{{end}}
+				 	</ul>
+
+				 	<form class="cf-form ui form" method="post">
+				 		{{.CSRFTokenHTML}}
+						<div class="cf-form__actions field">
+				 			<button class="cf-btn cf-btn--primary ui blue button">{{.i18n.Tr "settings.two_factor_regenerate_recovery_codes"}}</button>
+						</div>
+				 	</form>
+				</div>
+			</section>
+		</div>
+	</div>
+</main>
+{{template "base/footer" .}}
